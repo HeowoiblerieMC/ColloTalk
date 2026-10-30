@@ -8,17 +8,65 @@
   >
   <meta
     name="description"
-    content="ColloTalk is a modern chat platform for direct messages, private groups, and community servers."
+    content="ColloTalk connects direct conversations, private groups, and open communities."
   >
-  <meta name="theme-color" content="#080a0f">
+  <meta name="theme-color" content="#080a10">
   <title>ColloTalk</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=6">
 </head>
 <body>
-  <div class="app">
-    <aside class="server-rail" id="serverRail">
+  <section class="splash-screen" id="splashScreen">
+    <div class="splash-background"></div>
+
+    <div class="splash-content">
+      <div class="brand-logo brand-logo-large">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+        </svg>
+      </div>
+
+      <h1>ColloTalk</h1>
+
+      <div class="splash-tagline" aria-label="Talk. Speak. Open your world.">
+        <span>Talk.</span>
+        <span>Speak.</span>
+        <strong>Open your world.</strong>
+      </div>
+
+      <p>
+        Direct conversations, private groups, and open communities in one
+        simple place.
+      </p>
+
+      <div class="splash-actions">
+        <button class="primary-action" id="openAppButton" type="button">
+          Open ColloTalk
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+
+        <button class="secondary-action" id="openPlansButton" type="button">
+          Explore Collo Plans
+        </button>
+      </div>
+
+      <button class="skip-link" id="skipWelcomeButton" type="button">
+        Do not show this screen again
+      </button>
+    </div>
+
+    <div class="splash-footer">
+      <span>Collo Free</span>
+      <span>Collo Plus</span>
+      <span>Collo Pro</span>
+    </div>
+  </section>
+
+  <div class="app-shell" id="appShell" hidden>
+    <aside class="server-rail">
       <button
-        class="home-button active"
+        class="rail-button home-button active"
         id="homeButton"
         type="button"
         aria-label="Open home"
@@ -34,7 +82,7 @@
       <div class="server-list" id="serverList"></div>
 
       <button
-        class="add-server-button"
+        class="rail-button add-server-button"
         id="addServerButton"
         type="button"
         aria-label="Create server"
@@ -46,7 +94,7 @@
       </button>
     </aside>
 
-    <aside class="navigation-panel" id="navigationPanel">
+    <aside class="navigation-panel">
       <header class="navigation-header">
         <div>
           <h1 id="navigationTitle">ColloTalk</h1>
@@ -54,7 +102,7 @@
         </div>
 
         <button
-          class="icon-button mobile-close-button"
+          class="icon-button mobile-only"
           id="closeNavigationButton"
           type="button"
           aria-label="Close navigation"
@@ -66,20 +114,31 @@
       </header>
 
       <div class="navigation-content">
-        <div id="homeContent">
-          <nav class="main-links" aria-label="Main navigation">
-            <button class="main-link active" type="button">
+        <div id="homeNavigation">
+          <nav class="main-navigation" aria-label="Main navigation">
+            <button class="navigation-button active" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM17 8h4M19 6v4"/>
               </svg>
-              <span>Friends</span>
+              Friends
             </button>
 
-            <button class="main-link" type="button">
+            <button class="navigation-button" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 5h14v10H9l-4 4V5Z"/>
               </svg>
-              <span>Message Requests</span>
+              Message Requests
+            </button>
+
+            <button
+              class="navigation-button"
+              id="plansNavigationButton"
+              type="button"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m12 3 2.4 4.8L20 8.6l-4 3.9.9 5.5-4.9-2.6L7.1 18l.9-5.5-4-3.9 5.6-.8L12 3Z"/>
+              </svg>
+              Collo Plans
             </button>
           </nav>
 
@@ -91,7 +150,7 @@
                 class="small-button"
                 id="addDirectButton"
                 type="button"
-                aria-label="Start direct message"
+                aria-label="Create direct message"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 5v14M5 12h14"/>
@@ -99,9 +158,7 @@
               </button>
             </div>
 
-            <div class="item-list" id="directList">
-              <p class="empty-list">No direct messages yet.</p>
-            </div>
+            <div class="conversation-list" id="directList"></div>
           </section>
 
           <section class="navigation-section">
@@ -120,45 +177,45 @@
               </button>
             </div>
 
-            <div class="item-list" id="groupList">
-              <p class="empty-list">No private groups yet.</p>
-            </div>
+            <div class="conversation-list" id="groupList"></div>
           </section>
         </div>
 
-        <div id="serverContent" hidden>
-          <p class="server-description" id="serverDescription"></p>
-          <div id="channelList"></div>
+        <div id="serverNavigation" hidden>
+          <div class="server-description" id="serverDescription"></div>
+
+          <div class="section-heading">
+            <span>Text Channels</span>
+          </div>
+
+          <div class="channel-list" id="channelList"></div>
         </div>
       </div>
 
       <footer class="profile-bar">
         <div class="avatar avatar-blue" id="profileAvatar">G</div>
 
-        <button class="profile-button" id="profileButton" type="button">
+        <button class="profile-information" id="profileButton" type="button">
           <strong id="profileName">Guest</strong>
-          <span>Local prototype</span>
+          <span id="profilePlan">Collo Free</span>
         </button>
 
         <button
-          class="icon-button"
-          id="settingsButton"
+          class="plan-badge"
+          id="profilePlanButton"
           type="button"
-          aria-label="Edit profile"
-          title="Edit Profile"
+          title="View Collo Plans"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3-.1-1l2-1.5-2-3.4-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-5L9 6.1a7 7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.5 3.1h5l.5-3.1a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5a7 7 0 0 0 .1-1Z"/>
-          </svg>
+          FREE
         </button>
       </footer>
     </aside>
 
     <main class="chat-panel">
       <header class="chat-header">
-        <div class="chat-header-left">
+        <div class="chat-header-main">
           <button
-            class="icon-button menu-button"
+            class="icon-button mobile-only"
             id="menuButton"
             type="button"
             aria-label="Open navigation"
@@ -170,11 +227,11 @@
 
           <div class="chat-icon" id="chatIcon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+              <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4. 0 0 1 7.5 5Z"/>
             </svg>
           </div>
 
-          <div>
+          <div class="chat-heading">
             <h2 id="chatTitle">Welcome to ColloTalk</h2>
             <p id="chatSubtitle">Create a conversation to get started</p>
           </div>
@@ -184,7 +241,7 @@
           class="icon-button"
           id="deleteButton"
           type="button"
-          aria-label="Delete current conversation"
+          aria-label="Delete current item"
           title="Delete"
           hidden
         >
@@ -194,20 +251,7 @@
         </button>
       </header>
 
-      <section class="message-area" id="messageArea" aria-live="polite">
-        <div class="welcome-state" id="welcomeState">
-          <div class="welcome-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
-            </svg>
-          </div>
-
-          <h3>Your conversations start here</h3>
-          <p>
-            Create a direct message, private group, or community server.
-          </p>
-        </div>
-      </section>
+      <section class="message-area" id="messageArea" aria-live="polite"></section>
 
       <footer class="composer" id="composer" hidden>
         <form class="message-form" id="messageForm">
@@ -240,11 +284,172 @@
     </main>
   </div>
 
-  <div class="overlay" id="overlay"></div>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <dialog class="modal wide-modal" id="plansModal">
+    <div class="plans-modal-content">
+      <header class="plans-header">
+        <div>
+          <span class="eyebrow">Collo Membership</span>
+          <h2>Choose how you connect.</h2>
+          <p>
+            Start free, upgrade your experience, or unlock more power for
+            communities.
+          </p>
+        </div>
+
+        <button
+          class="icon-button"
+          id="closePlansButton"
+          type="button"
+          aria-label="Close plans"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="family-switch">
+        <button
+          class="family-switch-button active"
+          id="individualPlansButton"
+          type="button"
+        >
+          Individual
+        </button>
+
+        <button
+          class="family-switch-button"
+          id="familyPlansButton"
+          type="button"
+        >
+          Family
+          <span>4 people for the price of 3</span>
+        </button>
+      </div>
+
+      <div class="plan-grid">
+        <article class="plan-card free-card">
+          <div class="plan-card-top">
+            <span class="plan-label">FREE</span>
+            <h3>Collo Free</h3>
+            <p>Everything needed to start talking.</p>
+          </div>
+
+          <div class="plan-price">
+            <strong>Free</strong>
+            <span>forever</span>
+          </div>
+
+          <ul>
+            <li>Direct messages</li>
+            <li>Private groups with up to 15 people</li>
+            <li>Community servers</li>
+            <li>Standard profiles and uploads</li>
+          </ul>
+
+          <button class="plan-button current-plan-button" type="button">
+            Current Plan
+          </button>
+        </article>
+
+        <article class="plan-card plus-card">
+          <div class="plan-glow"></div>
+
+          <div class="plan-card-top">
+            <span class="plan-label">PLUS</span>
+            <h3>Collo Plus</h3>
+            <p>More ways to express yourself.</p>
+          </div>
+
+          <div class="plan-price" data-individual="Monthly plan" data-family="4 members">
+            <strong>Plus</strong>
+            <span class="dynamic-plan-detail">Monthly plan</span>
+          </div>
+
+          <ul>
+            <li>Everything in Collo Free</li>
+            <li>Custom profile themes</li>
+            <li>Larger, higher-quality uploads</li>
+            <li>Additional reactions and emojis</li>
+            <li>Advanced message search</li>
+            <li>Plus profile badge</li>
+          </ul>
+
+          <button
+            class="plan-button plus-plan-button"
+            type="button"
+            data-plan="Collo Plus"
+          >
+            Preview Plus
+          </button>
+        </article>
+
+        <article class="plan-card pro-card">
+          <div class="popular-badge">MOST POWERFUL</div>
+          <div class="plan-glow"></div>
+
+          <div class="plan-card-top">
+            <span class="plan-label">PRO</span>
+            <h3>Collo Pro</h3>
+            <p>Built for creators and growing communities.</p>
+          </div>
+
+          <div class="plan-price" data-individual="Monthly plan" data-family="4 members">
+            <strong>Pro</strong>
+            <span class="dynamic-plan-detail">Monthly plan</span>
+          </div>
+
+          <ul>
+            <li>Everything in Collo Plus</li>
+            <li>Advanced server management</li>
+            <li>Server analytics and audit history</li>
+            <li>Custom server branding</li>
+            <li>Server promotion tools</li>
+            <li>Pro profile badge</li>
+          </ul>
+
+          <button
+            class="plan-button pro-plan-button"
+            type="button"
+            data-plan="Collo Pro"
+          >
+            Preview Pro
+          </button>
+        </article>
+      </div>
+
+      <section class="gift-section">
+        <div class="gift-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 10h16v10H4V10ZM3 7h18v3H3V7ZM12 7v13M12 7H8.5A2.5 2.5 0 1 1 11 4.5L12 7Zm0 0h3.5A2.5 2.5 0 1 0 13 4.5L12 7Z"/>
+          </svg>
+        </div>
+
+        <div>
+          <span class="eyebrow">Collo Gifts</span>
+          <h3>Give someone more ways to connect.</h3>
+          <p>
+            Collo Plus and Collo Pro will be giftable for selected durations.
+            Gift subscriptions will not renew automatically.
+          </p>
+        </div>
+
+        <button class="gift-button" id="giftPreviewButton" type="button">
+          Preview Gifting
+        </button>
+      </section>
+
+      <p class="prototype-notice">
+        Plan selection and payments are not active in this prototype.
+      </p>
+    </div>
+  </dialog>
 
   <dialog class="modal" id="createModal">
     <form class="modal-card" id="createForm">
-      <div class="modal-header">
+      <header class="modal-header">
         <div>
           <h2 id="createTitle">Create</h2>
           <p id="createDescription"></p>
@@ -260,7 +465,7 @@
             <path d="m6 6 12 12M18 6 6 18"/>
           </svg>
         </button>
-      </div>
+      </header>
 
       <label for="createNameInput" id="createLabel">Name</label>
 
@@ -268,6 +473,7 @@
         id="createNameInput"
         type="text"
         maxlength="50"
+        autocomplete="off"
         required
       >
 
@@ -292,7 +498,7 @@
 
   <dialog class="modal" id="profileModal">
     <form class="modal-card" id="profileForm">
-      <div class="modal-header">
+      <header class="modal-header">
         <div>
           <h2>Edit Profile</h2>
           <p>Choose the name displayed with your messages.</p>
@@ -308,7 +514,7 @@
             <path d="m6 6 12 12M18 6 6 18"/>
           </svg>
         </button>
-      </div>
+      </header>
 
       <label for="profileNameInput">Display Name</label>
 
@@ -316,6 +522,7 @@
         id="profileNameInput"
         type="text"
         maxlength="24"
+        autocomplete="nickname"
         required
       >
 
@@ -337,6 +544,30 @@
     </form>
   </dialog>
 
-<script src="./app.js"></script>
+  <dialog class="modal" id="previewModal">
+    <div class="modal-card preview-card">
+      <div class="preview-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m12 3 2.4 4.8L20 8.6l-4 3.9.9 5.5-4.9-2.6L7.1 18l.9-5.5-4-3.9 5.6-.8L12 3Z"/>
+        </svg>
+      </div>
+
+      <span class="eyebrow">Coming Later</span>
+      <h2 id="previewTitle">Collo Plus</h2>
+      <p id="previewDescription">
+        Payments are not active in this prototype.
+      </p>
+
+      <button
+        class="primary-button full-width-button"
+        id="closePreviewButton"
+        type="button"
+      >
+        Got It
+      </button>
+    </div>
+  </dialog>
+
+  <link rel="stylesheet" href="style.css">
 </body>
 </html>
