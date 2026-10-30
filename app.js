@@ -1,272 +1,141 @@
-""use strict";
+"use strict";
 
-const STORAGE_KEYS = {
-  username: "collotalk_username",
-  messages: "collotalk_messages",
-  customItems: "collotalk_custom_items"
-};
+const STORAGE_KEY = "collotalk_state_v1";
 
 const state = {
   username: "Guest",
-  selectedType: "direct",
-  selectedId: "alice",
-  selectedServerId: null,
+  directs: [],
+  groups: [],
+  servers: [],
   messages: {},
-  customItems: {
-    directs: [],
-    groups: [],
-    servers: []
-  },
+  selectedType: null,
+  selectedId: null,
+  selectedServerId: null,
   createMode: null
-};
-
-const data = {
-  directs: [
-    {
-      id: "alice",
-      name: "Alice",
-      subtitle: "Online",
-      preview: "Start a conversation",
-      color: "avatar-purple",
-      online: true
-    },
-    {
-      id: "ethan",
-      name: "Ethan",
-      subtitle: "Offline",
-      preview: "No messages yet",
-      color: "avatar-green",
-      online: false
-    }
-  ],
-  groups: [
-    {
-      id: "study-team",
-      name: "Study Team",
-      subtitle: "6 members",
-      preview: "Private group",
-      color: "avatar-orange",
-      memberCount: 6,
-      limit: 15
-    },
-    {
-      id: "game-night",
-      name: "Game Night",
-      subtitle: "11 members",
-      preview: "Private group",
-      color: "avatar-pink",
-      memberCount: 11,
-      limit: 15
-    }
-  ],
-  servers: [
-    {
-      id: "collotalk-community",
-      name: "ColloTalk Community",
-      shortName: "CC",
-      description: "The official community server for ColloTalk discussions.",
-      memberCount: 128,
-      onlineCount: 34,
-      categories: [
-        {
-          name: "Information",
-          channels: [
-            { id: "welcome", name: "welcome" },
-            { id: "announcements", name: "announcements" }
-          ]
-        },
-        {
-          name: "Community",
-          channels: [
-            { id: "general", name: "general" },
-            { id: "random", name: "random" },
-            { id: "media", name: "media" }
-          ]
-        }
-      ]
-    },
-    {
-      id: "developers",
-      name: "Developers",
-      shortName: "DV",
-      description: "A community server for development projects and ideas.",
-      memberCount: 74,
-      onlineCount: 18,
-      categories: [
-        {
-          name: "General",
-          channels: [
-            { id: "general", name: "general" },
-            { id: "introductions", name: "introductions" }
-          ]
-        },
-        {
-          name: "Development",
-          channels: [
-            { id: "projects", name: "projects" },
-            { id: "ideas", name: "ideas" },
-            { id: "bugs", name: "bugs" }
-          ]
-        }
-      ]
-    }
-  ]
 };
 
 const elements = {
   app: document.querySelector(".app"),
-  serverButtons: document.getElementById("serverButtons"),
-  sidebarTitle: document.getElementById("sidebarTitle"),
-  sidebarSubtitle: document.getElementById("sidebarSubtitle"),
-  homeNavigation: document.getElementById("homeNavigation"),
-  serverNavigation: document.getElementById("serverNavigation"),
+  homeButton: document.getElementById("homeButton"),
+  serverList: document.getElementById("serverList"),
+  addServerButton: document.getElementById("addServerButton"),
+  navigationTitle: document.getElementById("navigationTitle"),
+  navigationSubtitle: document.getElementById("navigationSubtitle"),
+  homeContent: document.getElementById("homeContent"),
+  serverContent: document.getElementById("serverContent"),
   serverDescription: document.getElementById("serverDescription"),
-  channelCategories: document.getElementById("channelCategories"),
+  channelList: document.getElementById("channelList"),
   directList: document.getElementById("directList"),
   groupList: document.getElementById("groupList"),
-  chatAvatar: document.getElementById("chatAvatar"),
-  chatTitle: document.getElementById("chatTitle"),
-  chatSubtitle: document.getElementById("chatSubtitle"),
-  chatStatusDot: document.getElementById("chatStatusDot"),
-  messageArea: document.getElementById("messageArea"),
-  messageForm: document.getElementById("messageForm"),
-  messageInput: document.getElementById("messageInput"),
-  sendButton: document.getElementById("sendButton"),
-  characterCount: document.getElementById("characterCount"),
-  detailsPanel: document.getElementById("detailsPanel"),
-  detailsContent: document.getElementById("detailsContent"),
-  detailsButton: document.getElementById("detailsButton"),
-  closeDetailsButton: document.getElementById("closeDetailsButton"),
-  clearButton: document.getElementById("clearButton"),
-  menuButton: document.getElementById("menuButton"),
-  closeSidebarButton: document.getElementById("closeSidebarButton"),
-  mobileOverlay: document.getElementById("mobileOverlay"),
+  addDirectButton: document.getElementById("addDirectButton"),
+  addGroupButton: document.getElementById("addGroupButton"),
   profileAvatar: document.getElementById("profileAvatar"),
   profileName: document.getElementById("profileName"),
   profileButton: document.getElementById("profileButton"),
   settingsButton: document.getElementById("settingsButton"),
-  createDirectButton: document.getElementById("createDirectButton"),
-  createGroupButton: document.getElementById("createGroupButton"),
-  createServerButton: document.getElementById("createServerButton"),
-  profileModal: document.getElementById("profileModal"),
-  profileForm: document.getElementById("profileForm"),
-  usernameInput: document.getElementById("usernameInput"),
-  profileError: document.getElementById("profileError"),
-  closeProfileModalButton: document.getElementById("closeProfileModalButton"),
-  cancelProfileButton: document.getElementById("cancelProfileButton"),
+  chatIcon: document.getElementById("chatIcon"),
+  chatTitle: document.getElementById("chatTitle"),
+  chatSubtitle: document.getElementById("chatSubtitle"),
+  deleteButton: document.getElementById("deleteButton"),
+  messageArea: document.getElementById("messageArea"),
+  composer: document.getElementById("composer"),
+  messageForm: document.getElementById("messageForm"),
+  messageInput: document.getElementById("messageInput"),
+  sendButton: document.getElementById("sendButton"),
+  characterCount: document.getElementById("characterCount"),
+  menuButton: document.getElementById("menuButton"),
+  closeNavigationButton: document.getElementById("closeNavigationButton"),
+  overlay: document.getElementById("overlay"),
   createModal: document.getElementById("createModal"),
   createForm: document.getElementById("createForm"),
-  createModalTitle: document.getElementById("createModalTitle"),
-  createModalDescription: document.getElementById("createModalDescription"),
-  createNameLabel: document.getElementById("createNameLabel"),
+  createTitle: document.getElementById("createTitle"),
+  createDescription: document.getElementById("createDescription"),
+  createLabel: document.getElementById("createLabel"),
   createNameInput: document.getElementById("createNameInput"),
   createHint: document.getElementById("createHint"),
   createError: document.getElementById("createError"),
-  closeCreateModalButton: document.getElementById("closeCreateModalButton"),
+  closeCreateButton: document.getElementById("closeCreateButton"),
   cancelCreateButton: document.getElementById("cancelCreateButton"),
-  clearModal: document.getElementById("clearModal"),
-  clearForm: document.getElementById("clearForm"),
-  cancelClearButton: document.getElementById("cancelClearButton")
+  profileModal: document.getElementById("profileModal"),
+  profileForm: document.getElementById("profileForm"),
+  profileNameInput: document.getElementById("profileNameInput"),
+  profileError: document.getElementById("profileError"),
+  closeProfileButton: document.getElementById("closeProfileButton"),
+  cancelProfileButton: document.getElementById("cancelProfileButton")
 };
 
 function loadState() {
-  const savedUsername = localStorage.getItem(STORAGE_KEYS.username);
-  const savedMessages = localStorage.getItem(STORAGE_KEYS.messages);
-  const savedCustomItems = localStorage.getItem(STORAGE_KEYS.customItems);
+  const savedState = localStorage.getItem(STORAGE_KEY);
 
-  if (savedUsername && savedUsername.trim()) {
-    state.username = savedUsername.trim().slice(0, 24);
+  if (!savedState) {
+    return;
   }
 
-  if (savedMessages) {
-    try {
-      const parsedMessages = JSON.parse(savedMessages);
+  try {
+    const parsed = JSON.parse(savedState);
 
-      if (
-        parsedMessages &&
-        typeof parsedMessages === "object" &&
-        !Array.isArray(parsedMessages)
-      ) {
-        state.messages = parsedMessages;
-      }
-    } catch {
-      state.messages = {};
-    }
-  }
+    state.username =
+      typeof parsed.username === "string" ? parsed.username : "Guest";
 
-  if (savedCustomItems) {
-    try {
-      const parsedItems = JSON.parse(savedCustomItems);
+    state.directs = Array.isArray(parsed.directs) ? parsed.directs : [];
+    state.groups = Array.isArray(parsed.groups) ? parsed.groups : [];
+    state.servers = Array.isArray(parsed.servers) ? parsed.servers : [];
 
-      if (parsedItems && typeof parsedItems === "object") {
-        state.customItems.directs = Array.isArray(parsedItems.directs)
-          ? parsedItems.directs
-          : [];
-
-        state.customItems.groups = Array.isArray(parsedItems.groups)
-          ? parsedItems.groups
-          : [];
-
-        state.customItems.servers = Array.isArray(parsedItems.servers)
-          ? parsedItems.servers
-          : [];
-      }
-    } catch {
-      state.customItems = {
-        directs: [],
-        groups: [],
-        servers: []
-      };
-    }
+    state.messages =
+      parsed.messages &&
+      typeof parsed.messages === "object" &&
+      !Array.isArray(parsed.messages)
+        ? parsed.messages
+        : {};
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
   }
 }
 
-function saveMessages() {
+function saveState() {
   localStorage.setItem(
-    STORAGE_KEYS.messages,
-    JSON.stringify(state.messages)
+    STORAGE_KEY,
+    JSON.stringify({
+      username: state.username,
+      directs: state.directs,
+      groups: state.groups,
+      servers: state.servers,
+      messages: state.messages
+    })
   );
 }
 
-function saveCustomItems() {
-  localStorage.setItem(
-    STORAGE_KEYS.customItems,
-    JSON.stringify(state.customItems)
-  );
+function createId(prefix) {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
+    return `${prefix}-${crypto.randomUUID()}`;
+  }
+
+  return `${prefix}-${Date.now()}-${Math.random()
+    .toString(16)
+    .slice(2)}`;
 }
 
-function getDirects() {
-  return [...data.directs, ...state.customItems.directs];
-}
+function getInitial(value) {
+  const text = String(value || "").trim();
 
-function getGroups() {
-  return [...data.groups, ...state.customItems.groups];
-}
-
-function getServers() {
-  return [...data.servers, ...state.customItems.servers];
-}
-
-function getInitial(name) {
-  const trimmedName = String(name || "").trim();
-
-  if (!trimmedName) {
+  if (!text) {
     return "?";
   }
 
-  return Array.from(trimmedName)[0].toUpperCase();
+  return Array.from(text)[0].toUpperCase();
 }
 
-function createId(value) {
-  const normalized = value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+function getServerShortName(name) {
+  const words = name.trim().split(/\s+/).filter(Boolean);
 
-  const suffix = Date.now().toString(36);
+  if (words.length >= 2) {
+    return `${getInitial(words[0])}${getInitial(words[1])}`;
+  }
 
-  return normalized ? `${normalized}-${suffix}` : `item-${suffix}`;
+  return Array.from(name.trim()).slice(0, 2).join("").toUpperCase();
 }
 
 function getConversationKey() {
@@ -277,17 +146,17 @@ function getConversationKey() {
   return `${state.selectedType}:${state.selectedId}`;
 }
 
-function findCurrentConversation() {
+function getCurrentItem() {
   if (state.selectedType === "direct") {
-    return getDirects().find((item) => item.id === state.selectedId);
+    return state.directs.find((item) => item.id === state.selectedId);
   }
 
   if (state.selectedType === "group") {
-    return getGroups().find((item) => item.id === state.selectedId);
+    return state.groups.find((item) => item.id === state.selectedId);
   }
 
   if (state.selectedType === "server") {
-    const server = getServers().find(
+    const server = state.servers.find(
       (item) => item.id === state.selectedServerId
     );
 
@@ -295,18 +164,18 @@ function findCurrentConversation() {
       return null;
     }
 
-    for (const category of server.categories) {
-      const channel = category.channels.find(
-        (item) => item.id === state.selectedId
-      );
+    const channel = server.channels.find(
+      (item) => item.id === state.selectedId
+    );
 
-      if (channel) {
-        return {
-          ...channel,
-          server
-        };
-      }
+    if (!channel) {
+      return null;
     }
+
+    return {
+      ...channel,
+      server
+    };
   }
 
   return null;
@@ -317,11 +186,28 @@ function updateProfile() {
   elements.profileAvatar.textContent = getInitial(state.username);
 }
 
+function renderHome() {
+  elements.homeContent.hidden = false;
+  elements.serverContent.hidden = true;
+  elements.navigationTitle.textContent = "ColloTalk";
+  elements.navigationSubtitle.textContent = "Simple conversations";
+
+  renderDirects();
+  renderGroups();
+}
+
 function renderDirects() {
   elements.directList.replaceChildren();
 
-  getDirects().forEach((direct) => {
-    const button = createConversationButton(direct, "direct");
+  if (state.directs.length === 0) {
+    elements.directList.appendChild(
+      createEmptyList("No direct messages yet.")
+    );
+    return;
+  }
+
+  state.directs.forEach((direct) => {
+    const button = createItemButton(direct, "direct");
     elements.directList.appendChild(button);
   });
 }
@@ -329,15 +215,29 @@ function renderDirects() {
 function renderGroups() {
   elements.groupList.replaceChildren();
 
-  getGroups().forEach((group) => {
-    const button = createConversationButton(group, "group");
+  if (state.groups.length === 0) {
+    elements.groupList.appendChild(
+      createEmptyList("No private groups yet.")
+    );
+    return;
+  }
+
+  state.groups.forEach((group) => {
+    const button = createItemButton(group, "group");
     elements.groupList.appendChild(button);
   });
 }
 
-function createConversationButton(item, type) {
+function createEmptyList(text) {
+  const paragraph = document.createElement("p");
+  paragraph.className = "empty-list";
+  paragraph.textContent = text;
+  return paragraph;
+}
+
+function createItemButton(item, type) {
   const button = document.createElement("button");
-  button.className = "conversation-button";
+  button.className = "item-button";
   button.type = "button";
 
   if (
@@ -348,28 +248,27 @@ function createConversationButton(item, type) {
   }
 
   const avatar = document.createElement("div");
-  avatar.className = `avatar ${item.color || "avatar-purple"}`;
+  avatar.className =
+    type === "group"
+      ? "avatar avatar-orange"
+      : "avatar avatar-purple";
+
   avatar.textContent = getInitial(item.name);
 
-  const text = document.createElement("div");
-  text.className = "conversation-text";
-
-  const top = document.createElement("div");
-  top.className = "conversation-top";
+  const information = document.createElement("div");
+  information.className = "item-information";
 
   const name = document.createElement("strong");
   name.textContent = item.name;
 
-  const typeLabel = document.createElement("span");
-  typeLabel.textContent = type === "direct" ? "DM" : "Private";
+  const subtitle = document.createElement("span");
+  subtitle.textContent =
+    type === "group"
+      ? `${item.memberCount} of 15 members`
+      : "Direct message";
 
-  const preview = document.createElement("p");
-  preview.className = "conversation-preview";
-  preview.textContent = getLatestPreview(type, item);
-
-  top.append(name, typeLabel);
-  text.append(top, preview);
-  button.append(avatar, text);
+  information.append(name, subtitle);
+  button.append(avatar, information);
 
   button.addEventListener("click", () => {
     selectConversation(type, item.id);
@@ -378,25 +277,14 @@ function createConversationButton(item, type) {
   return button;
 }
 
-function getLatestPreview(type, item) {
-  const key = `${type}:${item.id}`;
-  const messages = state.messages[key];
-
-  if (Array.isArray(messages) && messages.length > 0) {
-    return messages.at(-1).text;
-  }
-
-  return item.preview || item.subtitle || "No messages yet";
-}
-
 function renderServers() {
-  elements.serverButtons.replaceChildren();
+  elements.serverList.replaceChildren();
 
-  getServers().forEach((server) => {
+  state.servers.forEach((server) => {
     const button = document.createElement("button");
-    button.className = "rail-button server-button";
+    button.className = "server-button";
     button.type = "button";
-    button.textContent = server.shortName || getInitial(server.name);
+    button.textContent = server.shortName;
     button.title = server.name;
     button.setAttribute("aria-label", `Open ${server.name}`);
 
@@ -411,8 +299,59 @@ function renderServers() {
       selectServer(server.id);
     });
 
-    elements.serverButtons.appendChild(button);
+    elements.serverList.appendChild(button);
   });
+}
+
+function renderServerNavigation(server) {
+  elements.homeContent.hidden = true;
+  elements.serverContent.hidden = false;
+  elements.navigationTitle.textContent = server.name;
+  elements.navigationSubtitle.textContent = "Community server";
+  elements.serverDescription.textContent = server.description;
+
+  elements.channelList.replaceChildren();
+
+  const section = document.createElement("section");
+  section.className = "channel-category";
+
+  const heading = document.createElement("div");
+  heading.className = "section-heading";
+  heading.textContent = "Text Channels";
+
+  section.appendChild(heading);
+
+  server.channels.forEach((channel) => {
+    const button = document.createElement("button");
+    button.className = "channel-button";
+    button.type = "button";
+
+    if (
+      state.selectedType === "server" &&
+      state.selectedId === channel.id
+    ) {
+      button.classList.add("active");
+    }
+
+    const symbol = document.createElement("span");
+    symbol.className = "channel-symbol";
+    symbol.textContent = "#";
+
+    const name = document.createElement("span");
+    name.textContent = channel.name;
+
+    button.append(symbol, name);
+
+    button.addEventListener("click", () => {
+      state.selectedId = channel.id;
+      renderApplication();
+      closeNavigation();
+    });
+
+    section.appendChild(button);
+  });
+
+  elements.channelList.appendChild(section);
 }
 
 function selectConversation(type, id) {
@@ -420,170 +359,102 @@ function selectConversation(type, id) {
   state.selectedId = id;
   state.selectedServerId = null;
 
-  showHomeNavigation();
   renderApplication();
-  closeMobileNavigation();
+  closeNavigation();
 }
 
 function selectServer(serverId) {
-  const server = getServers().find((item) => item.id === serverId);
+  const server = state.servers.find((item) => item.id === serverId);
 
-  if (!server || server.categories.length === 0) {
-    return;
-  }
-
-  const firstCategory = server.categories[0];
-  const firstChannel = firstCategory.channels[0];
-
-  if (!firstChannel) {
+  if (!server || server.channels.length === 0) {
     return;
   }
 
   state.selectedType = "server";
   state.selectedServerId = server.id;
-  state.selectedId = firstChannel.id;
+  state.selectedId = server.channels[0].id;
 
-  showServerNavigation(server);
   renderApplication();
-  closeMobileNavigation();
+  closeNavigation();
 }
 
-function selectChannel(channelId) {
-  state.selectedId = channelId;
+function showHome() {
+  state.selectedType = null;
+  state.selectedId = null;
+  state.selectedServerId = null;
+
   renderApplication();
-  closeMobileNavigation();
+  closeNavigation();
 }
 
-function showHomeNavigation() {
-  elements.homeNavigation.hidden = false;
-  elements.serverNavigation.hidden = true;
-  elements.sidebarTitle.textContent = "ColloTalk";
-  elements.sidebarSubtitle.textContent = "Simple conversations";
-}
+function renderChat() {
+  const item = getCurrentItem();
 
-function showServerNavigation(server) {
-  elements.homeNavigation.hidden = true;
-  elements.serverNavigation.hidden = false;
-  elements.sidebarTitle.textContent = server.name;
-  elements.sidebarSubtitle.textContent = `${server.memberCount} members`;
-  elements.serverDescription.textContent = server.description;
-
-  renderChannels(server);
-}
-
-function renderChannels(server) {
-  elements.channelCategories.replaceChildren();
-
-  server.categories.forEach((category) => {
-    const section = document.createElement("section");
-    section.className = "channel-category";
-
-    const heading = document.createElement("div");
-    heading.className = "section-title";
-    heading.textContent = category.name;
-
-    const list = document.createElement("div");
-    list.className = "conversation-list";
-
-    category.channels.forEach((channel) => {
-      const button = document.createElement("button");
-      button.className = "channel-button";
-      button.type = "button";
-
-      if (
-        state.selectedType === "server" &&
-        state.selectedServerId === server.id &&
-        state.selectedId === channel.id
-      ) {
-        button.classList.add("active");
-      }
-
-      const hash = document.createElement("span");
-      hash.className = "channel-hash";
-      hash.textContent = "#";
-
-      const name = document.createElement("span");
-      name.textContent = channel.name;
-
-      button.append(hash, name);
-
-      button.addEventListener("click", () => {
-        selectChannel(channel.id);
-      });
-
-      list.appendChild(button);
-    });
-
-    section.append(heading, list);
-    elements.channelCategories.appendChild(section);
-  });
-}
-
-function renderApplication() {
-  renderDirects();
-  renderGroups();
-  renderServers();
-
-  if (state.selectedType === "server") {
-    const server = getServers().find(
-      (item) => item.id === state.selectedServerId
-    );
-
-    if (server) {
-      showServerNavigation(server);
-    }
-  } else {
-    showHomeNavigation();
-  }
-
-  renderChatHeader();
-  renderMessages();
-  renderDetails();
-}
-
-function renderChatHeader() {
-  const conversation = findCurrentConversation();
-
-  if (!conversation) {
+  if (!item) {
+    renderWelcome();
     return;
   }
 
+  elements.composer.hidden = false;
+  elements.deleteButton.hidden = false;
+  elements.chatIcon.replaceChildren();
+
   if (state.selectedType === "direct") {
-    elements.chatTitle.textContent = conversation.name;
-    elements.chatSubtitle.textContent = conversation.online
-      ? "Online · Direct message"
-      : "Offline · Direct message";
-
-    elements.chatStatusDot.style.background = conversation.online
-      ? "var(--green)"
-      : "var(--muted)";
-
-    elements.chatAvatar.textContent = getInitial(conversation.name);
-    elements.chatAvatar.className =
-      `avatar ${conversation.color || "avatar-purple"}`;
+    elements.chatIcon.textContent = getInitial(item.name);
+    elements.chatTitle.textContent = item.name;
+    elements.chatSubtitle.textContent = "Direct message";
   }
 
   if (state.selectedType === "group") {
-    elements.chatTitle.textContent = conversation.name;
+    elements.chatIcon.textContent = getInitial(item.name);
+    elements.chatTitle.textContent = item.name;
     elements.chatSubtitle.textContent =
-      `${conversation.memberCount} of ${conversation.limit} members`;
-
-    elements.chatStatusDot.style.background = "var(--purple-light)";
-    elements.chatAvatar.textContent = getInitial(conversation.name);
-    elements.chatAvatar.className =
-      `avatar ${conversation.color || "avatar-orange"}`;
+      `${item.memberCount} of 15 members`;
   }
 
   if (state.selectedType === "server") {
-    elements.chatTitle.textContent = `# ${conversation.name}`;
-    elements.chatSubtitle.textContent = conversation.server.name;
-    elements.chatStatusDot.style.background = "var(--green)";
-    elements.chatAvatar.textContent = "#";
-    elements.chatAvatar.className = "avatar avatar-purple";
+    elements.chatIcon.textContent = "#";
+    elements.chatTitle.textContent = `# ${item.name}`;
+    elements.chatSubtitle.textContent = item.server.name;
   }
 
   elements.messageInput.placeholder =
     `Message ${elements.chatTitle.textContent}`;
+
+  renderMessages();
+}
+
+function renderWelcome() {
+  elements.composer.hidden = true;
+  elements.deleteButton.hidden = true;
+  elements.chatTitle.textContent = "Welcome to ColloTalk";
+  elements.chatSubtitle.textContent =
+    "Create a conversation to get started";
+
+  elements.chatIcon.replaceChildren();
+
+  const icon = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "svg"
+  );
+
+  icon.setAttribute("viewBox", "0 0 24 24");
+  icon.innerHTML =
+    '<path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>';
+
+  elements.chatIcon.appendChild(icon);
+
+  elements.messageArea.innerHTML = `
+    <div class="welcome-state">
+      <div class="welcome-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+        </svg>
+      </div>
+      <h3>Your conversations start here</h3>
+      <p>Create a direct message, private group, or community server.</p>
+    </div>
+  `;
 }
 
 function renderMessages() {
@@ -595,7 +466,40 @@ function renderMessages() {
     : [];
 
   if (messages.length === 0) {
-    elements.messageArea.appendChild(createEmptyState());
+    const item = getCurrentItem();
+    const wrapper = document.createElement("div");
+    wrapper.className = "welcome-state";
+
+    const icon = document.createElement("div");
+    icon.className = "welcome-icon";
+    icon.textContent =
+      state.selectedType === "server"
+        ? "#"
+        : getInitial(item.name);
+
+    const title = document.createElement("h3");
+    const description = document.createElement("p");
+
+    if (state.selectedType === "direct") {
+      title.textContent = item.name;
+      description.textContent =
+        "This direct conversation is stored locally in this browser.";
+    }
+
+    if (state.selectedType === "group") {
+      title.textContent = item.name;
+      description.textContent =
+        "This private group can contain up to 15 members.";
+    }
+
+    if (state.selectedType === "server") {
+      title.textContent = `#${item.name}`;
+      description.textContent =
+        `This channel belongs to ${item.server.name}.`;
+    }
+
+    wrapper.append(icon, title, description);
+    elements.messageArea.appendChild(wrapper);
     return;
   }
 
@@ -603,77 +507,27 @@ function renderMessages() {
     elements.messageArea.appendChild(createMessageElement(message));
   });
 
-  scrollToLatestMessage(false);
-}
-
-function createEmptyState() {
-  const conversation = findCurrentConversation();
-  const wrapper = document.createElement("div");
-  wrapper.className = "empty-state";
-
-  const icon = document.createElement("div");
-  icon.className = "empty-state-icon";
-  icon.innerHTML = `
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3a4.5 4.5 0 0 1-4.5 4.5H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
-    </svg>
-  `;
-
-  const title = document.createElement("h3");
-  const description = document.createElement("p");
-
-  if (state.selectedType === "direct") {
-    title.textContent = `Start a conversation with ${conversation.name}`;
-    description.textContent =
-      "This prototype stores messages locally in this browser. Online delivery will be added in a later development phase.";
-  }
-
-  if (state.selectedType === "group") {
-    title.textContent = conversation.name;
-    description.textContent =
-      `This private group currently has ${conversation.memberCount} members and supports up to ${conversation.limit} members.`;
-  }
-
-  if (state.selectedType === "server") {
-    title.textContent = `Welcome to #${conversation.name}`;
-    description.textContent =
-      `This is the beginning of the ${conversation.name} channel in ${conversation.server.name}.`;
-  }
-
-  wrapper.append(icon, title, description);
-
-  return wrapper;
+  scrollToBottom();
 }
 
 function createMessageElement(message) {
-  const group = document.createElement("article");
-  group.className = "message-group";
-
-  const isOwnMessage = message.author === state.username;
-
-  if (isOwnMessage) {
-    group.classList.add("own-message");
-  }
+  const article = document.createElement("article");
+  article.className = "message";
 
   const avatar = document.createElement("div");
-  avatar.className = isOwnMessage
-    ? "avatar avatar-blue"
-    : "avatar avatar-purple";
-
+  avatar.className = "avatar avatar-blue";
   avatar.textContent = getInitial(message.author);
 
-  const content = document.createElement("div");
-  content.className = "message-content";
+  const body = document.createElement("div");
+  body.className = "message-body";
 
-  const metadata = document.createElement("div");
-  metadata.className = "message-metadata";
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
 
-  const author = document.createElement("span");
-  author.className = "message-author";
+  const author = document.createElement("strong");
   author.textContent = message.author;
 
   const time = document.createElement("time");
-  time.className = "message-time";
   time.dateTime = message.createdAt;
   time.textContent = formatTime(message.createdAt);
 
@@ -681,11 +535,11 @@ function createMessageElement(message) {
   bubble.className = "message-bubble";
   bubble.textContent = message.text;
 
-  metadata.append(author, time);
-  content.append(metadata, bubble);
-  group.append(avatar, content);
+  meta.append(author, time);
+  body.append(meta, bubble);
+  article.append(avatar, body);
 
-  return group;
+  return article;
 }
 
 function formatTime(value) {
@@ -704,7 +558,7 @@ function formatTime(value) {
 function sendMessage() {
   const text = elements.messageInput.value.trim();
 
-  if (!text) {
+  if (!text || !state.selectedType) {
     return;
   }
 
@@ -721,20 +575,19 @@ function sendMessage() {
     createdAt: new Date().toISOString()
   });
 
-  saveMessages();
-
   elements.messageInput.value = "";
   updateComposer();
-  renderApplication();
-  scrollToLatestMessage(true);
-  elements.messageInput.focus();
+  saveState();
+  renderMessages();
+  scrollToBottom();
 }
 
 function updateComposer() {
   const value = elements.messageInput.value;
-  const length = value.length;
 
-  elements.characterCount.textContent = `${length} / 2000`;
+  elements.characterCount.textContent =
+    `${value.length} / 2000`;
+
   elements.sendButton.disabled = value.trim().length === 0;
 
   elements.messageInput.style.height = "auto";
@@ -742,131 +595,11 @@ function updateComposer() {
     `${Math.min(elements.messageInput.scrollHeight, 150)}px`;
 }
 
-function scrollToLatestMessage(smooth) {
+function scrollToBottom() {
   requestAnimationFrame(() => {
-    elements.messageArea.scrollTo({
-      top: elements.messageArea.scrollHeight,
-      behavior: smooth ? "smooth" : "auto"
-    });
+    elements.messageArea.scrollTop =
+      elements.messageArea.scrollHeight;
   });
-}
-
-function renderDetails() {
-  const conversation = findCurrentConversation();
-
-  if (!conversation) {
-    return;
-  }
-
-  elements.detailsContent.replaceChildren();
-
-  const profile = document.createElement("div");
-  profile.className = "detail-profile";
-
-  const avatar = document.createElement("div");
-  avatar.className = "avatar avatar-purple";
-
-  const title = document.createElement("h3");
-  const description = document.createElement("p");
-  const statistics = document.createElement("div");
-  statistics.className = "detail-statistics";
-
-  if (state.selectedType === "direct") {
-    avatar.textContent = getInitial(conversation.name);
-    title.textContent = conversation.name;
-    description.textContent =
-      "A private direct conversation between two people.";
-
-    statistics.append(
-      createStatistic("2", "Participants"),
-      createStatistic(conversation.online ? "Online" : "Offline", "Status")
-    );
-  }
-
-  if (state.selectedType === "group") {
-    avatar.textContent = getInitial(conversation.name);
-    title.textContent = conversation.name;
-    description.textContent =
-      "A private, invitation-only group conversation.";
-
-    statistics.append(
-      createStatistic(String(conversation.memberCount), "Members"),
-      createStatistic(String(conversation.limit), "Maximum")
-    );
-  }
-
-  if (state.selectedType === "server") {
-    avatar.textContent = "#";
-    title.textContent = conversation.server.name;
-    description.textContent = conversation.server.description;
-
-    statistics.append(
-      createStatistic(
-        String(conversation.server.memberCount),
-        "Members"
-      ),
-      createStatistic(
-        String(conversation.server.onlineCount),
-        "Online"
-      )
-    );
-  }
-
-  profile.append(avatar, title, description, statistics);
-  elements.detailsContent.appendChild(profile);
-}
-
-function createStatistic(value, label) {
-  const statistic = document.createElement("div");
-  statistic.className = "detail-statistic";
-
-  const strong = document.createElement("strong");
-  strong.textContent = value;
-
-  const span = document.createElement("span");
-  span.textContent = label;
-
-  statistic.append(strong, span);
-
-  return statistic;
-}
-
-function openProfileModal() {
-  elements.usernameInput.value =
-    state.username === "Guest" ? "" : state.username;
-
-  elements.profileError.textContent = "";
-
-  if (!elements.profileModal.open) {
-    elements.profileModal.showModal();
-  }
-
-  requestAnimationFrame(() => {
-    elements.usernameInput.focus();
-  });
-}
-
-function closeProfileModal() {
-  if (elements.profileModal.open) {
-    elements.profileModal.close();
-  }
-}
-
-function saveProfile() {
-  const username = elements.usernameInput.value.trim();
-
-  if (!username) {
-    elements.profileError.textContent = "Enter a display name.";
-    return;
-  }
-
-  state.username = username.slice(0, 24);
-
-  localStorage.setItem(STORAGE_KEYS.username, state.username);
-
-  updateProfile();
-  renderMessages();
-  closeProfileModal();
 }
 
 function openCreateModal(mode) {
@@ -875,42 +608,38 @@ function openCreateModal(mode) {
   elements.createError.textContent = "";
 
   if (mode === "direct") {
-    elements.createModalTitle.textContent = "New Direct Message";
-    elements.createModalDescription.textContent =
-      "Create a local direct conversation for this prototype.";
-    elements.createNameLabel.textContent = "Display Name";
+    elements.createTitle.textContent = "New Direct Message";
+    elements.createDescription.textContent =
+      "Create a local direct conversation.";
+    elements.createLabel.textContent = "Display Name";
     elements.createNameInput.placeholder = "Enter a name";
     elements.createHint.textContent =
       "Online user search will be added later.";
   }
 
   if (mode === "group") {
-    elements.createModalTitle.textContent = "Create Private Group";
-    elements.createModalDescription.textContent =
-      "Private groups support a maximum of 15 members.";
-    elements.createNameLabel.textContent = "Group Name";
+    elements.createTitle.textContent = "Create Private Group";
+    elements.createDescription.textContent =
+      "Private groups support up to 15 members.";
+    elements.createLabel.textContent = "Group Name";
     elements.createNameInput.placeholder = "Enter a group name";
     elements.createHint.textContent =
-      "This prototype creates the group locally.";
+      "You will be the first member of the group.";
   }
 
   if (mode === "server") {
-    elements.createModalTitle.textContent = "Create Server";
-    elements.createModalDescription.textContent =
-      "Servers can contain multiple community channels.";
-    elements.createNameLabel.textContent = "Server Name";
-    elements.createNameInput.placeholder = "Enter a server name";
+    elements.createTitle.textContent = "Create Server";
+    elements.createDescription.textContent =
+      "Create a community server with a general channel.";
+    elements.createLabel.textContent = "Server Name";
+    elements.createNameInput.placeholder =
+      "ColloTalk Official OpenChat";
     elements.createHint.textContent =
-      "The server will start with a general channel.";
+      "The server will initially be stored on this device.";
   }
 
-  if (!elements.createModal.open) {
-    elements.createModal.showModal();
-  }
-
-  requestAnimationFrame(() => {
-    elements.createNameInput.focus();
-  });
+  elements.createModal.showModal();
+  elements.createNameInput.focus();
 }
 
 function closeCreateModal() {
@@ -929,182 +658,171 @@ function createItem() {
     return;
   }
 
-  const id = createId(name);
-
   if (state.createMode === "direct") {
-    state.customItems.directs.push({
-      id,
-      name: name.slice(0, 40),
-      subtitle: "Offline",
-      preview: "No messages yet",
-      color: "avatar-purple",
-      online: false
-    });
+    const item = {
+      id: createId("direct"),
+      name: name.slice(0, 50)
+    };
 
+    state.directs.push(item);
     state.selectedType = "direct";
-    state.selectedId = id;
+    state.selectedId = item.id;
     state.selectedServerId = null;
   }
 
   if (state.createMode === "group") {
-    state.customItems.groups.push({
-      id,
-      name: name.slice(0, 40),
-      subtitle: "1 member",
-      preview: "Private group",
-      color: "avatar-orange",
-      memberCount: 1,
-      limit: 15
-    });
+    const item = {
+      id: createId("group"),
+      name: name.slice(0, 50),
+      memberCount: 1
+    };
 
+    state.groups.push(item);
     state.selectedType = "group";
-    state.selectedId = id;
+    state.selectedId = item.id;
     state.selectedServerId = null;
   }
 
   if (state.createMode === "server") {
     const server = {
-      id,
-      name: name.slice(0, 40),
-      shortName: createServerShortName(name),
-      description: "A community server created in this local prototype.",
-      memberCount: 1,
-      onlineCount: 1,
-      categories: [
+      id: createId("server"),
+      name: name.slice(0, 50),
+      shortName: getServerShortName(name),
+      description:
+        "A community server created with ColloTalk.",
+      channels: [
         {
-          name: "General",
-          channels: [
-            {
-              id: "general",
-              name: "general"
-            }
-          ]
+          id: createId("channel"),
+          name: "general"
         }
       ]
     };
 
-    state.customItems.servers.push(server);
+    state.servers.push(server);
     state.selectedType = "server";
-    state.selectedServerId = id;
-    state.selectedId = "general";
+    state.selectedServerId = server.id;
+    state.selectedId = server.channels[0].id;
   }
 
-  saveCustomItems();
+  saveState();
   closeCreateModal();
   renderApplication();
 }
 
-function createServerShortName(name) {
-  const words = name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
+function openProfileModal() {
+  elements.profileNameInput.value =
+    state.username === "Guest" ? "" : state.username;
 
-  if (words.length >= 2) {
-    return `${getInitial(words[0])}${getInitial(words[1])}`;
-  }
-
-  return Array.from(name.trim())
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  elements.profileError.textContent = "";
+  elements.profileModal.showModal();
+  elements.profileNameInput.focus();
 }
 
-function openClearModal() {
-  const key = getConversationKey();
-  const messages = state.messages[key];
+function closeProfileModal() {
+  if (elements.profileModal.open) {
+    elements.profileModal.close();
+  }
+}
 
-  if (!Array.isArray(messages) || messages.length === 0) {
+function saveProfile() {
+  const name = elements.profileNameInput.value.trim();
+
+  if (!name) {
+    elements.profileError.textContent =
+      "Enter a display name.";
     return;
   }
 
-  if (!elements.clearModal.open) {
-    elements.clearModal.showModal();
-  }
+  state.username = name.slice(0, 24);
+  saveState();
+  updateProfile();
+  closeProfileModal();
 }
 
-function closeClearModal() {
-  if (elements.clearModal.open) {
-    elements.clearModal.close();
+function deleteCurrentItem() {
+  if (!state.selectedType) {
+    return;
   }
-}
 
-function clearCurrentMessages() {
+  const confirmed = window.confirm(
+    "Delete the current local conversation?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
   const key = getConversationKey();
-
   delete state.messages[key];
-  saveMessages();
-  closeClearModal();
+
+  if (state.selectedType === "direct") {
+    state.directs = state.directs.filter(
+      (item) => item.id !== state.selectedId
+    );
+  }
+
+  if (state.selectedType === "group") {
+    state.groups = state.groups.filter(
+      (item) => item.id !== state.selectedId
+    );
+  }
+
+  if (state.selectedType === "server") {
+    state.servers = state.servers.filter(
+      (item) => item.id !== state.selectedServerId
+    );
+  }
+
+  state.selectedType = null;
+  state.selectedId = null;
+  state.selectedServerId = null;
+
+  saveState();
   renderApplication();
 }
 
-function openDetails() {
-  elements.app.classList.add("details-open");
-}
-
-function closeDetails() {
-  elements.app.classList.remove("details-open");
-}
-
-function openMobileNavigation() {
+function openNavigation() {
   elements.app.classList.add("navigation-open");
 }
 
-function closeMobileNavigation() {
+function closeNavigation() {
   elements.app.classList.remove("navigation-open");
 }
 
-function closeMobilePanels() {
-  closeMobileNavigation();
-  closeDetails();
+function renderApplication() {
+  updateProfile();
+  renderServers();
+
+  if (state.selectedType === "server") {
+    const server = state.servers.find(
+      (item) => item.id === state.selectedServerId
+    );
+
+    if (server) {
+      renderServerNavigation(server);
+    } else {
+      showHome();
+      return;
+    }
+  } else {
+    renderHome();
+  }
+
+  renderChat();
 }
 
-function setUpEventListeners() {
-  elements.messageForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    sendMessage();
-  });
+function setUpEvents() {
+  elements.homeButton.addEventListener("click", showHome);
 
-  elements.messageInput.addEventListener("input", updateComposer);
-
-  elements.messageInput.addEventListener("keydown", (event) => {
-    if (
-      event.key === "Enter" &&
-      !event.shiftKey &&
-      !event.isComposing
-    ) {
-      event.preventDefault();
-      sendMessage();
-    }
-  });
-
-  elements.profileButton.addEventListener("click", openProfileModal);
-  elements.settingsButton.addEventListener("click", openProfileModal);
-
-  elements.profileForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    saveProfile();
-  });
-
-  elements.closeProfileModalButton.addEventListener(
-    "click",
-    closeProfileModal
-  );
-
-  elements.cancelProfileButton.addEventListener(
-    "click",
-    closeProfileModal
-  );
-
-  elements.createDirectButton.addEventListener("click", () => {
+  elements.addDirectButton.addEventListener("click", () => {
     openCreateModal("direct");
   });
 
-  elements.createGroupButton.addEventListener("click", () => {
+  elements.addGroupButton.addEventListener("click", () => {
     openCreateModal("group");
   });
 
-  elements.createServerButton.addEventListener("click", () => {
+  elements.addServerButton.addEventListener("click", () => {
     openCreateModal("server");
   });
 
@@ -1113,7 +831,7 @@ function setUpEventListeners() {
     createItem();
   });
 
-  elements.closeCreateModalButton.addEventListener(
+  elements.closeCreateButton.addEventListener(
     "click",
     closeCreateModal
   );
@@ -1123,57 +841,85 @@ function setUpEventListeners() {
     closeCreateModal
   );
 
-  elements.clearButton.addEventListener("click", openClearModal);
-
-  elements.clearForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    clearCurrentMessages();
-  });
-
-  elements.cancelClearButton.addEventListener(
+  elements.profileButton.addEventListener(
     "click",
-    closeClearModal
+    openProfileModal
   );
 
-  elements.detailsButton.addEventListener("click", openDetails);
-  elements.closeDetailsButton.addEventListener("click", closeDetails);
+  elements.settingsButton.addEventListener(
+    "click",
+    openProfileModal
+  );
+
+  elements.profileForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    saveProfile();
+  });
+
+  elements.closeProfileButton.addEventListener(
+    "click",
+    closeProfileModal
+  );
+
+  elements.cancelProfileButton.addEventListener(
+    "click",
+    closeProfileModal
+  );
+
+  elements.messageForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    sendMessage();
+  });
+
+  elements.messageInput.addEventListener(
+    "input",
+    updateComposer
+  );
+
+  elements.messageInput.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey &&
+        !event.isComposing
+      ) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+  );
+
+  elements.deleteButton.addEventListener(
+    "click",
+    deleteCurrentItem
+  );
 
   elements.menuButton.addEventListener(
     "click",
-    openMobileNavigation
+    openNavigation
   );
 
-  elements.closeSidebarButton.addEventListener(
+  elements.closeNavigationButton.addEventListener(
     "click",
-    closeMobileNavigation
+    closeNavigation
   );
 
-  elements.mobileOverlay.addEventListener(
+  elements.overlay.addEventListener(
     "click",
-    closeMobilePanels
+    closeNavigation
   );
-
-  document.querySelector(".rail-logo").addEventListener("click", () => {
-    selectConversation("direct", "alice");
-  });
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 780) {
-      closeMobileNavigation();
-    }
-  });
 }
 
-function initializeApplication() {
+function initialize() {
   loadState();
-  updateProfile();
-  setUpEventListeners();
+  setUpEvents();
   renderApplication();
   updateComposer();
 
-  if (!localStorage.getItem(STORAGE_KEYS.username)) {
+  if (state.username === "Guest") {
     openProfileModal();
   }
 }
 
-initializeApplication();
+initialize();
