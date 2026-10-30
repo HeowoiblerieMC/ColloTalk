@@ -1,9 +1,12 @@
 "use strict";
 
-const STORAGE_KEY = "collotalk_state_v1";
+const STORAGE_KEY = "collotalk_state_v2";
+const LEGACY_STORAGE_KEY = "collotalk_state_v1";
+const WELCOME_KEY = "collotalk_hide_welcome";
 
 const state = {
   username: "Guest",
+  plan: "Collo Free",
   directs: [],
   groups: [],
   servers: [],
@@ -11,28 +14,35 @@ const state = {
   selectedType: null,
   selectedId: null,
   selectedServerId: null,
-  createMode: null
+  createMode: null,
+  familyMode: false
 };
 
 const elements = {
-  app: document.querySelector(".app"),
+  splashScreen: document.getElementById("splashScreen"),
+  appShell: document.getElementById("appShell"),
+  openAppButton: document.getElementById("openAppButton"),
+  openPlansButton: document.getElementById("openPlansButton"),
+  skipWelcomeButton: document.getElementById("skipWelcomeButton"),
   homeButton: document.getElementById("homeButton"),
   serverList: document.getElementById("serverList"),
   addServerButton: document.getElementById("addServerButton"),
   navigationTitle: document.getElementById("navigationTitle"),
   navigationSubtitle: document.getElementById("navigationSubtitle"),
-  homeContent: document.getElementById("homeContent"),
-  serverContent: document.getElementById("serverContent"),
+  homeNavigation: document.getElementById("homeNavigation"),
+  serverNavigation: document.getElementById("serverNavigation"),
   serverDescription: document.getElementById("serverDescription"),
   channelList: document.getElementById("channelList"),
   directList: document.getElementById("directList"),
   groupList: document.getElementById("groupList"),
   addDirectButton: document.getElementById("addDirectButton"),
   addGroupButton: document.getElementById("addGroupButton"),
+  plansNavigationButton: document.getElementById("plansNavigationButton"),
   profileAvatar: document.getElementById("profileAvatar"),
   profileName: document.getElementById("profileName"),
+  profilePlan: document.getElementById("profilePlan"),
   profileButton: document.getElementById("profileButton"),
-  settingsButton: document.getElementById("settingsButton"),
+  profilePlanButton: document.getElementById("profilePlanButton"),
   chatIcon: document.getElementById("chatIcon"),
   chatTitle: document.getElementById("chatTitle"),
   chatSubtitle: document.getElementById("chatSubtitle"),
@@ -45,7 +55,12 @@ const elements = {
   characterCount: document.getElementById("characterCount"),
   menuButton: document.getElementById("menuButton"),
   closeNavigationButton: document.getElementById("closeNavigationButton"),
-  overlay: document.getElementById("overlay"),
+  mobileOverlay: document.getElementById("mobileOverlay"),
+  plansModal: document.getElementById("plansModal"),
+  closePlansButton: document.getElementById("closePlansButton"),
+  individualPlansButton: document.getElementById("individualPlansButton"),
+  familyPlansButton: document.getElementById("familyPlansButton"),
+  giftPreviewButton: document.getElementById("giftPreviewButton"),
   createModal: document.getElementById("createModal"),
   createForm: document.getElementById("createForm"),
   createTitle: document.getElementById("createTitle"),
@@ -61,11 +76,17 @@ const elements = {
   profileNameInput: document.getElementById("profileNameInput"),
   profileError: document.getElementById("profileError"),
   closeProfileButton: document.getElementById("closeProfileButton"),
-  cancelProfileButton: document.getElementById("cancelProfileButton")
+  cancelProfileButton: document.getElementById("cancelProfileButton"),
+  previewModal: document.getElementById("previewModal"),
+  previewTitle: document.getElementById("previewTitle"),
+  previewDescription: document.getElementById("previewDescription"),
+  closePreviewButton: document.getElementById("closePreviewButton")
 };
 
 function loadState() {
-  const savedState = localStorage.getItem(STORAGE_KEY);
+  const savedState =
+    localStorage.getItem(STORAGE_KEY) ||
+    localStorage.getItem(LEGACY_STORAGE_KEY);
 
   if (!savedState) {
     return;
@@ -75,11 +96,26 @@ function loadState() {
     const parsed = JSON.parse(savedState);
 
     state.username =
-      typeof parsed.username === "string" ? parsed.username : "Guest";
+      typeof parsed.username === "string" && parsed.username.trim()
+        ? parsed.username
+        : "Guest";
 
-    state.directs = Array.isArray(parsed.directs) ? parsed.directs : [];
-    state.groups = Array.isArray(parsed.groups) ? parsed.groups : [];
-    state.servers = Array.isArray(parsed.servers) ? parsed.servers : [];
+    state.plan =
+      typeof parsed.plan === "string"
+        ? parsed.plan
+        : "Collo Free";
+
+    state.directs = Array.isArray(parsed.directs)
+      ? parsed.directs
+      : [];
+
+    state.groups = Array.isArray(parsed.groups)
+      ? parsed.groups
+      : [];
+
+    state.servers = Array.isArray(parsed.servers)
+      ? parsed.servers
+      : [];
 
     state.messages =
       parsed.messages &&
@@ -97,6 +133,7 @@ function saveState() {
     STORAGE_KEY,
     JSON.stringify({
       username: state.username,
+      plan: state.plan,
       directs: state.directs,
       groups: state.groups,
       servers: state.servers,
@@ -135,7 +172,35 @@ function getServerShortName(name) {
     return `${getInitial(words[0])}${getInitial(words[1])}`;
   }
 
-  return Array.from(name.trim()).slice(0, 2).join("").toUpperCase();
+  return Array.from(name.trim())
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+function showApplication() {
+  elements.appShell.hidden = false;
+  elements.splashScreen.classList.add("closing");
+
+  window.setTimeout(() => {
+    elements.splashScreen.hidden = true;
+  }, 500);
+}
+
+function showWelcome() {
+  elements.splashScreen.hidden = false;
+  elements.splashScreen.classList.remove("closing");
+  elements.appShell.hidden = true;
+}
+
+function initializeEntryScreen() {
+  if (localStorage.getItem(WELCOME_KEY) === "true") {
+    elements.splashScreen.hidden = true;
+    elements.appShell.hidden = false;
+    return;
+  }
+
+  showWelcome();
 }
 
 function getConversationKey() {
@@ -148,11 +213,15 @@ function getConversationKey() {
 
 function getCurrentItem() {
   if (state.selectedType === "direct") {
-    return state.directs.find((item) => item.id === state.selectedId);
+    return state.directs.find(
+      (item) => item.id === state.selectedId
+    );
   }
 
   if (state.selectedType === "group") {
-    return state.groups.find((item) => item.id === state.selectedId);
+    return state.groups.find(
+      (item) => item.id === state.selectedId
+    );
   }
 
   if (state.selectedType === "server") {
@@ -184,11 +253,37 @@ function getCurrentItem() {
 function updateProfile() {
   elements.profileName.textContent = state.username;
   elements.profileAvatar.textContent = getInitial(state.username);
+  elements.profilePlan.textContent = state.plan;
+
+  const shortPlan = state.plan.replace("Collo ", "").toUpperCase();
+  elements.profilePlanButton.textContent = shortPlan;
 }
 
-function renderHome() {
-  elements.homeContent.hidden = false;
-  elements.serverContent.hidden = true;
+function renderApplication() {
+  updateProfile();
+  renderServers();
+
+  if (state.selectedType === "server") {
+    const server = state.servers.find(
+      (item) => item.id === state.selectedServerId
+    );
+
+    if (server) {
+      renderServerNavigation(server);
+    } else {
+      resetSelection();
+      renderHomeNavigation();
+    }
+  } else {
+    renderHomeNavigation();
+  }
+
+  renderChat();
+}
+
+function renderHomeNavigation() {
+  elements.homeNavigation.hidden = false;
+  elements.serverNavigation.hidden = true;
   elements.navigationTitle.textContent = "ColloTalk";
   elements.navigationSubtitle.textContent = "Simple conversations";
 
@@ -207,8 +302,9 @@ function renderDirects() {
   }
 
   state.directs.forEach((direct) => {
-    const button = createItemButton(direct, "direct");
-    elements.directList.appendChild(button);
+    elements.directList.appendChild(
+      createConversationButton(direct, "direct")
+    );
   });
 }
 
@@ -223,8 +319,9 @@ function renderGroups() {
   }
 
   state.groups.forEach((group) => {
-    const button = createItemButton(group, "group");
-    elements.groupList.appendChild(button);
+    elements.groupList.appendChild(
+      createConversationButton(group, "group")
+    );
   });
 }
 
@@ -235,9 +332,9 @@ function createEmptyList(text) {
   return paragraph;
 }
 
-function createItemButton(item, type) {
+function createConversationButton(item, type) {
   const button = document.createElement("button");
-  button.className = "item-button";
+  button.className = "conversation-button";
   button.type = "button";
 
   if (
@@ -256,7 +353,7 @@ function createItemButton(item, type) {
   avatar.textContent = getInitial(item.name);
 
   const information = document.createElement("div");
-  information.className = "item-information";
+  information.className = "conversation-information";
 
   const name = document.createElement("strong");
   name.textContent = item.name;
@@ -264,14 +361,19 @@ function createItemButton(item, type) {
   const subtitle = document.createElement("span");
   subtitle.textContent =
     type === "group"
-      ? `${item.memberCount} of 15 members`
+      ? `${item.memberCount || 1} of 15 members`
       : "Direct message";
 
   information.append(name, subtitle);
   button.append(avatar, information);
 
   button.addEventListener("click", () => {
-    selectConversation(type, item.id);
+    state.selectedType = type;
+    state.selectedId = item.id;
+    state.selectedServerId = null;
+
+    renderApplication();
+    closeNavigation();
   });
 
   return button;
@@ -282,7 +384,7 @@ function renderServers() {
 
   state.servers.forEach((server) => {
     const button = document.createElement("button");
-    button.className = "server-button";
+    button.className = "rail-button server-button";
     button.type = "button";
     button.textContent = server.shortName;
     button.title = server.name;
@@ -304,32 +406,19 @@ function renderServers() {
 }
 
 function renderServerNavigation(server) {
-  elements.homeContent.hidden = true;
-  elements.serverContent.hidden = false;
+  elements.homeNavigation.hidden = true;
+  elements.serverNavigation.hidden = false;
   elements.navigationTitle.textContent = server.name;
   elements.navigationSubtitle.textContent = "Community server";
   elements.serverDescription.textContent = server.description;
-
   elements.channelList.replaceChildren();
-
-  const section = document.createElement("section");
-  section.className = "channel-category";
-
-  const heading = document.createElement("div");
-  heading.className = "section-heading";
-  heading.textContent = "Text Channels";
-
-  section.appendChild(heading);
 
   server.channels.forEach((channel) => {
     const button = document.createElement("button");
     button.className = "channel-button";
     button.type = "button";
 
-    if (
-      state.selectedType === "server" &&
-      state.selectedId === channel.id
-    ) {
+    if (state.selectedId === channel.id) {
       button.classList.add("active");
     }
 
@@ -343,28 +432,22 @@ function renderServerNavigation(server) {
     button.append(symbol, name);
 
     button.addEventListener("click", () => {
+      state.selectedType = "server";
+      state.selectedServerId = server.id;
       state.selectedId = channel.id;
+
       renderApplication();
       closeNavigation();
     });
 
-    section.appendChild(button);
+    elements.channelList.appendChild(button);
   });
-
-  elements.channelList.appendChild(section);
-}
-
-function selectConversation(type, id) {
-  state.selectedType = type;
-  state.selectedId = id;
-  state.selectedServerId = null;
-
-  renderApplication();
-  closeNavigation();
 }
 
 function selectServer(serverId) {
-  const server = state.servers.find((item) => item.id === serverId);
+  const server = state.servers.find(
+    (item) => item.id === serverId
+  );
 
   if (!server || server.channels.length === 0) {
     return;
@@ -378,11 +461,14 @@ function selectServer(serverId) {
   closeNavigation();
 }
 
-function showHome() {
+function resetSelection() {
   state.selectedType = null;
   state.selectedId = null;
   state.selectedServerId = null;
+}
 
+function showHome() {
+  resetSelection();
   renderApplication();
   closeNavigation();
 }
@@ -391,7 +477,7 @@ function renderChat() {
   const item = getCurrentItem();
 
   if (!item) {
-    renderWelcome();
+    renderWelcomeState();
     return;
   }
 
@@ -409,7 +495,7 @@ function renderChat() {
     elements.chatIcon.textContent = getInitial(item.name);
     elements.chatTitle.textContent = item.name;
     elements.chatSubtitle.textContent =
-      `${item.memberCount} of 15 members`;
+      `${item.memberCount || 1} of 15 members`;
   }
 
   if (state.selectedType === "server") {
@@ -424,25 +510,18 @@ function renderChat() {
   renderMessages();
 }
 
-function renderWelcome() {
+function renderWelcomeState() {
   elements.composer.hidden = true;
   elements.deleteButton.hidden = true;
   elements.chatTitle.textContent = "Welcome to ColloTalk";
   elements.chatSubtitle.textContent =
     "Create a conversation to get started";
 
-  elements.chatIcon.replaceChildren();
-
-  const icon = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "svg"
-  );
-
-  icon.setAttribute("viewBox", "0 0 24 24");
-  icon.innerHTML =
-    '<path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>';
-
-  elements.chatIcon.appendChild(icon);
+  elements.chatIcon.innerHTML = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+    </svg>
+  `;
 
   elements.messageArea.innerHTML = `
     <div class="welcome-state">
@@ -478,22 +557,24 @@ function renderMessages() {
         : getInitial(item.name);
 
     const title = document.createElement("h3");
+    title.textContent =
+      state.selectedType === "server"
+        ? `#${item.name}`
+        : item.name;
+
     const description = document.createElement("p");
 
     if (state.selectedType === "direct") {
-      title.textContent = item.name;
       description.textContent =
         "This direct conversation is stored locally in this browser.";
     }
 
     if (state.selectedType === "group") {
-      title.textContent = item.name;
       description.textContent =
-        "This private group can contain up to 15 members.";
+        "This private group can contain up to 15 people.";
     }
 
     if (state.selectedType === "server") {
-      title.textContent = `#${item.name}`;
       description.textContent =
         `This channel belongs to ${item.server.name}.`;
     }
@@ -504,7 +585,9 @@ function renderMessages() {
   }
 
   messages.forEach((message) => {
-    elements.messageArea.appendChild(createMessageElement(message));
+    elements.messageArea.appendChild(
+      createMessageElement(message)
+    );
   });
 
   scrollToBottom();
@@ -519,7 +602,6 @@ function createMessageElement(message) {
   avatar.textContent = getInitial(message.author);
 
   const body = document.createElement("div");
-  body.className = "message-body";
 
   const meta = document.createElement("div");
   meta.className = "message-meta";
@@ -620,26 +702,29 @@ function openCreateModal(mode) {
   if (mode === "group") {
     elements.createTitle.textContent = "Create Private Group";
     elements.createDescription.textContent =
-      "Private groups support up to 15 members.";
+      "Private groups support up to 15 people.";
     elements.createLabel.textContent = "Group Name";
     elements.createNameInput.placeholder = "Enter a group name";
     elements.createHint.textContent =
-      "You will be the first member of the group.";
+      "You will be the first member.";
   }
 
   if (mode === "server") {
     elements.createTitle.textContent = "Create Server";
     elements.createDescription.textContent =
-      "Create a community server with a general channel.";
+      "Create an open community with a general channel.";
     elements.createLabel.textContent = "Server Name";
     elements.createNameInput.placeholder =
       "ColloTalk Official OpenChat";
     elements.createHint.textContent =
-      "The server will initially be stored on this device.";
+      "The server will be stored on this device.";
   }
 
   elements.createModal.showModal();
-  elements.createNameInput.focus();
+
+  requestAnimationFrame(() => {
+    elements.createNameInput.focus();
+  });
 }
 
 function closeCreateModal() {
@@ -688,8 +773,7 @@ function createItem() {
       id: createId("server"),
       name: name.slice(0, 50),
       shortName: getServerShortName(name),
-      description:
-        "A community server created with ColloTalk.",
+      description: "A community server created with ColloTalk.",
       channels: [
         {
           id: createId("channel"),
@@ -715,7 +799,10 @@ function openProfileModal() {
 
   elements.profileError.textContent = "";
   elements.profileModal.showModal();
-  elements.profileNameInput.focus();
+
+  requestAnimationFrame(() => {
+    elements.profileNameInput.focus();
+  });
 }
 
 function closeProfileModal() {
@@ -734,6 +821,7 @@ function saveProfile() {
   }
 
   state.username = name.slice(0, 24);
+
   saveState();
   updateProfile();
   closeProfileModal();
@@ -773,45 +861,98 @@ function deleteCurrentItem() {
     );
   }
 
-  state.selectedType = null;
-  state.selectedId = null;
-  state.selectedServerId = null;
-
+  resetSelection();
   saveState();
   renderApplication();
 }
 
+function openPlansModal() {
+  if (!elements.plansModal.open) {
+    elements.plansModal.showModal();
+  }
+}
+
+function closePlansModal() {
+  if (elements.plansModal.open) {
+    elements.plansModal.close();
+  }
+}
+
+function setPlanMode(familyMode) {
+  state.familyMode = familyMode;
+
+  elements.individualPlansButton.classList.toggle(
+    "active",
+    !familyMode
+  );
+
+  elements.familyPlansButton.classList.toggle(
+    "active",
+    familyMode
+  );
+
+  document
+    .querySelectorAll(".dynamic-plan-detail")
+    .forEach((detail) => {
+      const parent = detail.closest(".plan-price");
+
+      detail.textContent = familyMode
+        ? parent.dataset.family
+        : parent.dataset.individual;
+    });
+
+  document
+    .querySelectorAll("[data-plan]")
+    .forEach((button) => {
+      const basePlan = button.dataset.plan;
+
+      button.textContent = familyMode
+        ? `Preview ${basePlan} Family`
+        : `Preview ${basePlan.replace("Collo ", "")}`;
+    });
+}
+
+function openPreview(title, description) {
+  elements.previewTitle.textContent = title;
+  elements.previewDescription.textContent = description;
+
+  if (!elements.previewModal.open) {
+    elements.previewModal.showModal();
+  }
+}
+
+function closePreview() {
+  if (elements.previewModal.open) {
+    elements.previewModal.close();
+  }
+}
+
 function openNavigation() {
-  elements.app.classList.add("navigation-open");
+  elements.appShell.classList.add("navigation-open");
+  elements.mobileOverlay.classList.add("visible");
 }
 
 function closeNavigation() {
-  elements.app.classList.remove("navigation-open");
-}
-
-function renderApplication() {
-  updateProfile();
-  renderServers();
-
-  if (state.selectedType === "server") {
-    const server = state.servers.find(
-      (item) => item.id === state.selectedServerId
-    );
-
-    if (server) {
-      renderServerNavigation(server);
-    } else {
-      showHome();
-      return;
-    }
-  } else {
-    renderHome();
-  }
-
-  renderChat();
+  elements.appShell.classList.remove("navigation-open");
+  elements.mobileOverlay.classList.remove("visible");
 }
 
 function setUpEvents() {
+  elements.openAppButton.addEventListener(
+    "click",
+    showApplication
+  );
+
+  elements.openPlansButton.addEventListener("click", () => {
+    elements.appShell.hidden = false;
+    openPlansModal();
+  });
+
+  elements.skipWelcomeButton.addEventListener("click", () => {
+    localStorage.setItem(WELCOME_KEY, "true");
+    showApplication();
+  });
+
   elements.homeButton.addEventListener("click", showHome);
 
   elements.addDirectButton.addEventListener("click", () => {
@@ -842,11 +983,6 @@ function setUpEvents() {
   );
 
   elements.profileButton.addEventListener(
-    "click",
-    openProfileModal
-  );
-
-  elements.settingsButton.addEventListener(
     "click",
     openProfileModal
   );
@@ -895,6 +1031,66 @@ function setUpEvents() {
     deleteCurrentItem
   );
 
+  elements.plansNavigationButton.addEventListener(
+    "click",
+    openPlansModal
+  );
+
+  elements.profilePlanButton.addEventListener(
+    "click",
+    openPlansModal
+  );
+
+  elements.closePlansButton.addEventListener(
+    "click",
+    closePlansModal
+  );
+
+  elements.individualPlansButton.addEventListener(
+    "click",
+    () => {
+      setPlanMode(false);
+    }
+  );
+
+  elements.familyPlansButton.addEventListener(
+    "click",
+    () => {
+      setPlanMode(true);
+    }
+  );
+
+  document
+    .querySelectorAll("[data-plan]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const basePlan = button.dataset.plan;
+
+        const planName = state.familyMode
+          ? `${basePlan} Family`
+          : basePlan;
+
+        openPreview(
+          planName,
+          state.familyMode
+            ? "This family plan will support up to four independent accounts for the price of three individual subscriptions. Payments are not active yet."
+            : "Subscriptions and payments are not active in this prototype. This screen currently previews the planned membership experience."
+        );
+      });
+    });
+
+  elements.giftPreviewButton.addEventListener("click", () => {
+    openPreview(
+      "Collo Gifts",
+      "Collo Plus and Collo Pro will be giftable to another user. Gift subscriptions will not renew automatically."
+    );
+  });
+
+  elements.closePreviewButton.addEventListener(
+    "click",
+    closePreview
+  );
+
   elements.menuButton.addEventListener(
     "click",
     openNavigation
@@ -905,7 +1101,7 @@ function setUpEvents() {
     closeNavigation
   );
 
-  elements.overlay.addEventListener(
+  elements.mobileOverlay.addEventListener(
     "click",
     closeNavigation
   );
@@ -916,8 +1112,13 @@ function initialize() {
   setUpEvents();
   renderApplication();
   updateComposer();
+  setPlanMode(false);
+  initializeEntryScreen();
 
-  if (state.username === "Guest") {
+  if (
+    state.username === "Guest" &&
+    localStorage.getItem(WELCOME_KEY) === "true"
+  ) {
     openProfileModal();
   }
 }
