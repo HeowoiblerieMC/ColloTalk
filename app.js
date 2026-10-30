@@ -1,29 +1,46 @@
 "use strict";
 
-const STORAGE_KEY = "collotalk_state_v2";
-const LEGACY_STORAGE_KEY = "collotalk_state_v1";
-const WELCOME_KEY = "collotalk_hide_welcome";
+const SUPABASE_URL = "https://mvollazjrwebwqkpqagqk.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_mrDiTI54EOV0agHDCJJ2jQ_epAqSxXC";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
 const state = {
-  username: "Guest",
-  plan: "Collo Free",
-  directs: [],
-  groups: [],
+  authMode: "signup",
+  session: null,
+  user: null,
+  profile: null,
   servers: [],
-  messages: {},
-  selectedType: null,
-  selectedId: null,
-  selectedServerId: null,
-  createMode: null,
-  familyMode: false
+  memberships: [],
+  channels: [],
+  selectedServer: null,
+  selectedChannel: null,
+  messageSubscription: null
 };
 
 const elements = {
-  splashScreen: document.getElementById("splashScreen"),
+  landingScreen: document.getElementById("landingScreen"),
+  authScreen: document.getElementById("authScreen"),
   appShell: document.getElementById("appShell"),
-  openAppButton: document.getElementById("openAppButton"),
-  openPlansButton: document.getElementById("openPlansButton"),
-  skipWelcomeButton: document.getElementById("skipWelcomeButton"),
+  getStartedButton: document.getElementById("getStartedButton"),
+  signInButton: document.getElementById("signInButton"),
+  authBackButton: document.getElementById("authBackButton"),
+  authForm: document.getElementById("authForm"),
+  authEyebrow: document.getElementById("authEyebrow"),
+  authTitle: document.getElementById("authTitle"),
+  authDescription: document.getElementById("authDescription"),
+  signupFields: document.getElementById("signupFields"),
+  usernameInput: document.getElementById("usernameInput"),
+  displayNameInput: document.getElementById("displayNameInput"),
+  emailInput: document.getElementById("emailInput"),
+  passwordInput: document.getElementById("passwordInput"),
+  authMessage: document.getElementById("authMessage"),
+  authSubmitButton: document.getElementById("authSubmitButton"),
+  authSwitchButton: document.getElementById("authSwitchButton"),
   homeButton: document.getElementById("homeButton"),
   serverList: document.getElementById("serverList"),
   addServerButton: document.getElementById("addServerButton"),
@@ -31,22 +48,19 @@ const elements = {
   navigationSubtitle: document.getElementById("navigationSubtitle"),
   homeNavigation: document.getElementById("homeNavigation"),
   serverNavigation: document.getElementById("serverNavigation"),
+  discoverNavigation: document.getElementById("discoverNavigation"),
   serverDescription: document.getElementById("serverDescription"),
   channelList: document.getElementById("channelList"),
-  directList: document.getElementById("directList"),
-  groupList: document.getElementById("groupList"),
-  addDirectButton: document.getElementById("addDirectButton"),
-  addGroupButton: document.getElementById("addGroupButton"),
-  plansNavigationButton: document.getElementById("plansNavigationButton"),
+  discoverServersButton: document.getElementById("discoverServersButton"),
+  discoverList: document.getElementById("discoverList"),
   profileAvatar: document.getElementById("profileAvatar"),
   profileName: document.getElementById("profileName"),
-  profilePlan: document.getElementById("profilePlan"),
+  profileUsername: document.getElementById("profileUsername"),
   profileButton: document.getElementById("profileButton"),
-  profilePlanButton: document.getElementById("profilePlanButton"),
+  signOutButton: document.getElementById("signOutButton"),
   chatIcon: document.getElementById("chatIcon"),
   chatTitle: document.getElementById("chatTitle"),
   chatSubtitle: document.getElementById("chatSubtitle"),
-  deleteButton: document.getElementById("deleteButton"),
   messageArea: document.getElementById("messageArea"),
   composer: document.getElementById("composer"),
   messageForm: document.getElementById("messageForm"),
@@ -56,103 +70,38 @@ const elements = {
   menuButton: document.getElementById("menuButton"),
   closeNavigationButton: document.getElementById("closeNavigationButton"),
   mobileOverlay: document.getElementById("mobileOverlay"),
-  plansModal: document.getElementById("plansModal"),
-  closePlansButton: document.getElementById("closePlansButton"),
-  individualPlansButton: document.getElementById("individualPlansButton"),
-  familyPlansButton: document.getElementById("familyPlansButton"),
-  giftPreviewButton: document.getElementById("giftPreviewButton"),
-  createModal: document.getElementById("createModal"),
-  createForm: document.getElementById("createForm"),
-  createTitle: document.getElementById("createTitle"),
-  createDescription: document.getElementById("createDescription"),
-  createLabel: document.getElementById("createLabel"),
-  createNameInput: document.getElementById("createNameInput"),
-  createHint: document.getElementById("createHint"),
-  createError: document.getElementById("createError"),
-  closeCreateButton: document.getElementById("closeCreateButton"),
-  cancelCreateButton: document.getElementById("cancelCreateButton"),
+  createServerModal: document.getElementById("createServerModal"),
+  createServerForm: document.getElementById("createServerForm"),
+  serverNameInput: document.getElementById("serverNameInput"),
+  serverDescriptionInput: document.getElementById("serverDescriptionInput"),
+  publicServerInput: document.getElementById("publicServerInput"),
+  createServerMessage: document.getElementById("createServerMessage"),
+  closeCreateServerButton: document.getElementById("closeCreateServerButton"),
+  cancelCreateServerButton: document.getElementById("cancelCreateServerButton"),
   profileModal: document.getElementById("profileModal"),
   profileForm: document.getElementById("profileForm"),
-  profileNameInput: document.getElementById("profileNameInput"),
-  profileError: document.getElementById("profileError"),
+  profileDisplayNameInput: document.getElementById(
+    "profileDisplayNameInput"
+  ),
+  profileBioInput: document.getElementById("profileBioInput"),
+  profileMessage: document.getElementById("profileMessage"),
   closeProfileButton: document.getElementById("closeProfileButton"),
-  cancelProfileButton: document.getElementById("cancelProfileButton"),
-  previewModal: document.getElementById("previewModal"),
-  previewTitle: document.getElementById("previewTitle"),
-  previewDescription: document.getElementById("previewDescription"),
-  closePreviewButton: document.getElementById("closePreviewButton")
+  cancelProfileButton: document.getElementById("cancelProfileButton")
 };
 
-function loadState() {
-  const savedState =
-    localStorage.getItem(STORAGE_KEY) ||
-    localStorage.getItem(LEGACY_STORAGE_KEY);
-
-  if (!savedState) {
-    return;
-  }
-
-  try {
-    const parsed = JSON.parse(savedState);
-
-    state.username =
-      typeof parsed.username === "string" && parsed.username.trim()
-        ? parsed.username
-        : "Guest";
-
-    state.plan =
-      typeof parsed.plan === "string"
-        ? parsed.plan
-        : "Collo Free";
-
-    state.directs = Array.isArray(parsed.directs)
-      ? parsed.directs
-      : [];
-
-    state.groups = Array.isArray(parsed.groups)
-      ? parsed.groups
-      : [];
-
-    state.servers = Array.isArray(parsed.servers)
-      ? parsed.servers
-      : [];
-
-    state.messages =
-      parsed.messages &&
-      typeof parsed.messages === "object" &&
-      !Array.isArray(parsed.messages)
-        ? parsed.messages
-        : {};
-  } catch {
-    localStorage.removeItem(STORAGE_KEY);
-  }
+function showScreen(screenName) {
+  elements.landingScreen.hidden = screenName !== "landing";
+  elements.authScreen.hidden = screenName !== "auth";
+  elements.appShell.hidden = screenName !== "app";
 }
 
-function saveState() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({
-      username: state.username,
-      plan: state.plan,
-      directs: state.directs,
-      groups: state.groups,
-      servers: state.servers,
-      messages: state.messages
-    })
-  );
-}
+function setFormMessage(element, message, type = "") {
+  element.textContent = message;
+  element.className = "form-message";
 
-function createId(prefix) {
-  if (
-    typeof crypto !== "undefined" &&
-    typeof crypto.randomUUID === "function"
-  ) {
-    return `${prefix}-${crypto.randomUUID()}`;
+  if (type) {
+    element.classList.add(type);
   }
-
-  return `${prefix}-${Date.now()}-${Math.random()
-    .toString(16)
-    .slice(2)}`;
 }
 
 function getInitial(value) {
@@ -165,7 +114,7 @@ function getInitial(value) {
   return Array.from(text)[0].toUpperCase();
 }
 
-function getServerShortName(name) {
+function createServerShortName(name) {
   const words = name.trim().split(/\s+/).filter(Boolean);
 
   if (words.length >= 2) {
@@ -178,344 +127,249 @@ function getServerShortName(name) {
     .toUpperCase();
 }
 
-function showApplication() {
-  elements.appShell.hidden = false;
-  elements.splashScreen.classList.add("closing");
+function setAuthMode(mode) {
+  state.authMode = mode;
+  const signup = mode === "signup";
 
-  window.setTimeout(() => {
-    elements.splashScreen.hidden = true;
-  }, 500);
+  elements.signupFields.hidden = !signup;
+  elements.usernameInput.required = signup;
+  elements.displayNameInput.required = signup;
+
+  elements.passwordInput.autocomplete = signup
+    ? "new-password"
+    : "current-password";
+
+  elements.authEyebrow.textContent = signup
+    ? "CREATE ACCOUNT"
+    : "WELCOME BACK";
+
+  elements.authTitle.textContent = signup
+    ? "Join ColloTalk"
+    : "Sign in to ColloTalk";
+
+  elements.authDescription.textContent = signup
+    ? "Create an account and begin connecting."
+    : "Continue your conversations and communities.";
+
+  elements.authSubmitButton.textContent = signup
+    ? "Create Account"
+    : "Sign In";
+
+  elements.authSwitchButton.textContent = signup
+    ? "Already have an account? Sign in"
+    : "Need an account? Create one";
+
+  setFormMessage(elements.authMessage, "");
 }
 
-function showWelcome() {
-  elements.splashScreen.hidden = false;
-  elements.splashScreen.classList.remove("closing");
-  elements.appShell.hidden = true;
-}
+async function handleAuthentication(event) {
+  event.preventDefault();
 
-function initializeEntryScreen() {
-  if (localStorage.getItem(WELCOME_KEY) === "true") {
-    elements.splashScreen.hidden = true;
-    elements.appShell.hidden = false;
-    return;
-  }
+  const email = elements.emailInput.value.trim();
+  const password = elements.passwordInput.value;
 
-  showWelcome();
-}
+  elements.authSubmitButton.disabled = true;
+  setFormMessage(elements.authMessage, "Connecting...");
 
-function getConversationKey() {
-  if (state.selectedType === "server") {
-    return `server:${state.selectedServerId}:${state.selectedId}`;
-  }
+  try {
+    if (state.authMode === "signup") {
+      const username = elements.usernameInput.value.trim();
+      const displayName = elements.displayNameInput.value.trim();
 
-  return `${state.selectedType}:${state.selectedId}`;
-}
+      if (!/^[A-Za-z0-9_]{3,24}$/.test(username)) {
+        throw new Error(
+          "Username must be 3 to 24 characters and use only letters, numbers, or underscores."
+        );
+      }
 
-function getCurrentItem() {
-  if (state.selectedType === "direct") {
-    return state.directs.find(
-      (item) => item.id === state.selectedId
-    );
-  }
+      if (!displayName) {
+        throw new Error("Enter a display name.");
+      }
 
-  if (state.selectedType === "group") {
-    return state.groups.find(
-      (item) => item.id === state.selectedId
-    );
-  }
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+            display_name: displayName
+          }
+        }
+      });
 
-  if (state.selectedType === "server") {
-    const server = state.servers.find(
-      (item) => item.id === state.selectedServerId
-    );
+      if (error) {
+        throw error;
+      }
 
-    if (!server) {
-      return null;
-    }
+      if (!data.session) {
+        setFormMessage(
+          elements.authMessage,
+          "Account created. Check your email and confirm your account before signing in.",
+          "success"
+        );
 
-    const channel = server.channels.find(
-      (item) => item.id === state.selectedId
-    );
+        setAuthMode("signin");
+        elements.emailInput.value = email;
+        return;
+      }
 
-    if (!channel) {
-      return null;
-    }
-
-    return {
-      ...channel,
-      server
-    };
-  }
-
-  return null;
-}
-
-function updateProfile() {
-  elements.profileName.textContent = state.username;
-  elements.profileAvatar.textContent = getInitial(state.username);
-  elements.profilePlan.textContent = state.plan;
-
-  const shortPlan = state.plan.replace("Collo ", "").toUpperCase();
-  elements.profilePlanButton.textContent = shortPlan;
-}
-
-function renderApplication() {
-  updateProfile();
-  renderServers();
-
-  if (state.selectedType === "server") {
-    const server = state.servers.find(
-      (item) => item.id === state.selectedServerId
-    );
-
-    if (server) {
-      renderServerNavigation(server);
+      await startAuthenticatedApplication(data.session);
     } else {
-      resetSelection();
-      renderHomeNavigation();
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      await startAuthenticatedApplication(data.session);
     }
+  } catch (error) {
+    setFormMessage(
+      elements.authMessage,
+      error.message || "Authentication failed.",
+      "error"
+    );
+  } finally {
+    elements.authSubmitButton.disabled = false;
+  }
+}
+
+async function startAuthenticatedApplication(session) {
+  state.session = session;
+  state.user = session.user;
+
+  setFormMessage(elements.authMessage, "");
+  showScreen("app");
+
+  await loadProfile();
+  await loadServers();
+  renderHome();
+}
+
+async function loadProfile() {
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", state.user.id)
+    .single();
+
+  if (error) {
+    console.error("Profile loading failed:", error);
+    return;
+  }
+
+  state.profile = data;
+  renderProfile();
+}
+
+function renderProfile() {
+  if (!state.profile) {
+    return;
+  }
+
+  elements.profileName.textContent = state.profile.display_name;
+  elements.profileUsername.textContent = `@${state.profile.username}`;
+  elements.profileAvatar.textContent = getInitial(
+    state.profile.display_name
+  );
+}
+
+async function loadServers() {
+  const [
+    serversResult,
+    membershipsResult
+  ] = await Promise.all([
+    supabaseClient
+      .from("servers")
+      .select("*")
+      .order("created_at", { ascending: true }),
+    supabaseClient
+      .from("server_members")
+      .select("server_id, role")
+      .eq("user_id", state.user.id)
+  ]);
+
+  if (serversResult.error) {
+    console.error("Server loading failed:", serversResult.error);
+    state.servers = [];
   } else {
-    renderHomeNavigation();
+    state.servers = serversResult.data || [];
   }
 
-  renderChat();
-}
-
-function renderHomeNavigation() {
-  elements.homeNavigation.hidden = false;
-  elements.serverNavigation.hidden = true;
-  elements.navigationTitle.textContent = "ColloTalk";
-  elements.navigationSubtitle.textContent = "Simple conversations";
-
-  renderDirects();
-  renderGroups();
-}
-
-function renderDirects() {
-  elements.directList.replaceChildren();
-
-  if (state.directs.length === 0) {
-    elements.directList.appendChild(
-      createEmptyList("No direct messages yet.")
+  if (membershipsResult.error) {
+    console.error(
+      "Membership loading failed:",
+      membershipsResult.error
     );
-    return;
+    state.memberships = [];
+  } else {
+    state.memberships = membershipsResult.data || [];
   }
 
-  state.directs.forEach((direct) => {
-    elements.directList.appendChild(
-      createConversationButton(direct, "direct")
-    );
-  });
+  renderServerRail();
 }
 
-function renderGroups() {
-  elements.groupList.replaceChildren();
-
-  if (state.groups.length === 0) {
-    elements.groupList.appendChild(
-      createEmptyList("No private groups yet.")
-    );
-    return;
-  }
-
-  state.groups.forEach((group) => {
-    elements.groupList.appendChild(
-      createConversationButton(group, "group")
-    );
-  });
+function isServerMember(serverId) {
+  return state.memberships.some(
+    (membership) => membership.server_id === serverId
+  );
 }
 
-function createEmptyList(text) {
-  const paragraph = document.createElement("p");
-  paragraph.className = "empty-list";
-  paragraph.textContent = text;
-  return paragraph;
-}
-
-function createConversationButton(item, type) {
-  const button = document.createElement("button");
-  button.className = "conversation-button";
-  button.type = "button";
-
-  if (
-    state.selectedType === type &&
-    state.selectedId === item.id
-  ) {
-    button.classList.add("active");
-  }
-
-  const avatar = document.createElement("div");
-  avatar.className =
-    type === "group"
-      ? "avatar avatar-orange"
-      : "avatar avatar-purple";
-
-  avatar.textContent = getInitial(item.name);
-
-  const information = document.createElement("div");
-  information.className = "conversation-information";
-
-  const name = document.createElement("strong");
-  name.textContent = item.name;
-
-  const subtitle = document.createElement("span");
-  subtitle.textContent =
-    type === "group"
-      ? `${item.memberCount || 1} of 15 members`
-      : "Direct message";
-
-  information.append(name, subtitle);
-  button.append(avatar, information);
-
-  button.addEventListener("click", () => {
-    state.selectedType = type;
-    state.selectedId = item.id;
-    state.selectedServerId = null;
-
-    renderApplication();
-    closeNavigation();
-  });
-
-  return button;
-}
-
-function renderServers() {
+function renderServerRail() {
   elements.serverList.replaceChildren();
 
-  state.servers.forEach((server) => {
+  const joinedServers = state.servers.filter((server) =>
+    isServerMember(server.id)
+  );
+
+  joinedServers.forEach((server) => {
     const button = document.createElement("button");
     button.className = "rail-button server-button";
     button.type = "button";
-    button.textContent = server.shortName;
+    button.textContent = createServerShortName(server.name);
     button.title = server.name;
     button.setAttribute("aria-label", `Open ${server.name}`);
 
-    if (
-      state.selectedType === "server" &&
-      state.selectedServerId === server.id
-    ) {
+    if (state.selectedServer?.id === server.id) {
       button.classList.add("active");
     }
 
     button.addEventListener("click", () => {
-      selectServer(server.id);
+      openServer(server.id);
     });
 
     elements.serverList.appendChild(button);
   });
 }
 
-function renderServerNavigation(server) {
+function hideNavigationViews() {
   elements.homeNavigation.hidden = true;
-  elements.serverNavigation.hidden = false;
-  elements.navigationTitle.textContent = server.name;
-  elements.navigationSubtitle.textContent = "Community server";
-  elements.serverDescription.textContent = server.description;
-  elements.channelList.replaceChildren();
-
-  server.channels.forEach((channel) => {
-    const button = document.createElement("button");
-    button.className = "channel-button";
-    button.type = "button";
-
-    if (state.selectedId === channel.id) {
-      button.classList.add("active");
-    }
-
-    const symbol = document.createElement("span");
-    symbol.className = "channel-symbol";
-    symbol.textContent = "#";
-
-    const name = document.createElement("span");
-    name.textContent = channel.name;
-
-    button.append(symbol, name);
-
-    button.addEventListener("click", () => {
-      state.selectedType = "server";
-      state.selectedServerId = server.id;
-      state.selectedId = channel.id;
-
-      renderApplication();
-      closeNavigation();
-    });
-
-    elements.channelList.appendChild(button);
-  });
+  elements.serverNavigation.hidden = true;
+  elements.discoverNavigation.hidden = true;
 }
 
-function selectServer(serverId) {
-  const server = state.servers.find(
-    (item) => item.id === serverId
-  );
+function renderHome() {
+  hideNavigationViews();
+  elements.homeNavigation.hidden = false;
 
-  if (!server || server.channels.length === 0) {
-    return;
-  }
+  elements.navigationTitle.textContent = "ColloTalk";
+  elements.navigationSubtitle.textContent = "Online conversations";
 
-  state.selectedType = "server";
-  state.selectedServerId = server.id;
-  state.selectedId = server.channels[0].id;
+  state.selectedServer = null;
+  state.selectedChannel = null;
+  state.channels = [];
 
-  renderApplication();
-  closeNavigation();
-}
+  removeMessageSubscription();
+  renderServerRail();
 
-function resetSelection() {
-  state.selectedType = null;
-  state.selectedId = null;
-  state.selectedServerId = null;
-}
-
-function showHome() {
-  resetSelection();
-  renderApplication();
-  closeNavigation();
-}
-
-function renderChat() {
-  const item = getCurrentItem();
-
-  if (!item) {
-    renderWelcomeState();
-    return;
-  }
-
-  elements.composer.hidden = false;
-  elements.deleteButton.hidden = false;
-  elements.chatIcon.replaceChildren();
-
-  if (state.selectedType === "direct") {
-    elements.chatIcon.textContent = getInitial(item.name);
-    elements.chatTitle.textContent = item.name;
-    elements.chatSubtitle.textContent = "Direct message";
-  }
-
-  if (state.selectedType === "group") {
-    elements.chatIcon.textContent = getInitial(item.name);
-    elements.chatTitle.textContent = item.name;
-    elements.chatSubtitle.textContent =
-      `${item.memberCount || 1} of 15 members`;
-  }
-
-  if (state.selectedType === "server") {
-    elements.chatIcon.textContent = "#";
-    elements.chatTitle.textContent = `# ${item.name}`;
-    elements.chatSubtitle.textContent = item.server.name;
-  }
-
-  elements.messageInput.placeholder =
-    `Message ${elements.chatTitle.textContent}`;
-
-  renderMessages();
-}
-
-function renderWelcomeState() {
   elements.composer.hidden = true;
-  elements.deleteButton.hidden = true;
   elements.chatTitle.textContent = "Welcome to ColloTalk";
   elements.chatSubtitle.textContent =
-    "Create a conversation to get started";
+    "Select or create a server to begin";
 
   elements.chatIcon.innerHTML = `
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -530,57 +384,163 @@ function renderWelcomeState() {
           <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
         </svg>
       </div>
-      <h3>Your conversations start here</h3>
-      <p>Create a direct message, private group, or community server.</p>
+      <h3>Talk. Speak. Open your world.</h3>
+      <p>Create a server or discover a public community.</p>
     </div>
   `;
+
+  closeNavigation();
 }
 
-function renderMessages() {
+async function openServer(serverId) {
+  const server = state.servers.find((item) => item.id === serverId);
+
+  if (!server || !isServerMember(serverId)) {
+    return;
+  }
+
+  state.selectedServer = server;
+
+  hideNavigationViews();
+  elements.serverNavigation.hidden = false;
+
+  elements.navigationTitle.textContent = server.name;
+  elements.navigationSubtitle.textContent = "Community server";
+  elements.serverDescription.textContent =
+    server.description || "No description provided.";
+
+  const { data, error } = await supabaseClient
+    .from("channels")
+    .select("*")
+    .eq("server_id", server.id)
+    .order("position", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Channel loading failed:", error);
+    return;
+  }
+
+  state.channels = data || [];
+  renderChannels();
+  renderServerRail();
+
+  if (state.channels.length > 0) {
+    await openChannel(state.channels[0].id);
+  }
+
+  closeNavigation();
+}
+
+function renderChannels() {
+  elements.channelList.replaceChildren();
+
+  state.channels.forEach((channel) => {
+    const button = document.createElement("button");
+    button.className = "channel-button";
+    button.type = "button";
+
+    if (state.selectedChannel?.id === channel.id) {
+      button.classList.add("active");
+    }
+
+    const symbol = document.createElement("span");
+    symbol.className = "channel-symbol";
+    symbol.textContent = "#";
+
+    const name = document.createElement("span");
+    name.textContent = channel.name;
+
+    button.append(symbol, name);
+
+    button.addEventListener("click", () => {
+      openChannel(channel.id);
+    });
+
+    elements.channelList.appendChild(button);
+  });
+}
+
+async function openChannel(channelId) {
+  const channel = state.channels.find(
+    (item) => item.id === channelId
+  );
+
+  if (!channel) {
+    return;
+  }
+
+  state.selectedChannel = channel;
+
+  elements.chatIcon.textContent = "#";
+  elements.chatTitle.textContent = `# ${channel.name}`;
+  elements.chatSubtitle.textContent = state.selectedServer.name;
+  elements.composer.hidden = false;
+  elements.messageInput.placeholder = `Message #${channel.name}`;
+
+  renderChannels();
+  await loadMessages();
+  subscribeToMessages(channel.id);
+}
+
+async function loadMessages() {
+  if (!state.selectedChannel) {
+    return;
+  }
+
+  elements.messageArea.innerHTML = `
+    <div class="welcome-state">
+      <p>Loading messages...</p>
+    </div>
+  `;
+
+  const { data, error } = await supabaseClient
+    .from("server_messages")
+    .select(`
+      id,
+      channel_id,
+      sender_id,
+      content,
+      created_at,
+      edited_at,
+      profiles:sender_id (
+        username,
+        display_name,
+        avatar_url
+      )
+    `)
+    .eq("channel_id", state.selectedChannel.id)
+    .order("created_at", { ascending: true })
+    .limit(200);
+
+  if (error) {
+    console.error("Message loading failed:", error);
+
+    elements.messageArea.innerHTML = `
+      <div class="welcome-state">
+        <h3>Messages could not be loaded</h3>
+        <p>${escapeHtml(error.message)}</p>
+      </div>
+    `;
+
+    return;
+  }
+
+  renderMessages(data || []);
+}
+
+function renderMessages(messages) {
   elements.messageArea.replaceChildren();
 
-  const key = getConversationKey();
-  const messages = Array.isArray(state.messages[key])
-    ? state.messages[key]
-    : [];
-
   if (messages.length === 0) {
-    const item = getCurrentItem();
-    const wrapper = document.createElement("div");
-    wrapper.className = "welcome-state";
+    elements.messageArea.innerHTML = `
+      <div class="welcome-state">
+        <div class="welcome-icon">#</div>
+        <h3>Welcome to #${escapeHtml(state.selectedChannel.name)}</h3>
+        <p>This is the beginning of the channel.</p>
+      </div>
+    `;
 
-    const icon = document.createElement("div");
-    icon.className = "welcome-icon";
-    icon.textContent =
-      state.selectedType === "server"
-        ? "#"
-        : getInitial(item.name);
-
-    const title = document.createElement("h3");
-    title.textContent =
-      state.selectedType === "server"
-        ? `#${item.name}`
-        : item.name;
-
-    const description = document.createElement("p");
-
-    if (state.selectedType === "direct") {
-      description.textContent =
-        "This direct conversation is stored locally in this browser.";
-    }
-
-    if (state.selectedType === "group") {
-      description.textContent =
-        "This private group can contain up to 15 people.";
-    }
-
-    if (state.selectedType === "server") {
-      description.textContent =
-        `This channel belongs to ${item.server.name}.`;
-    }
-
-    wrapper.append(icon, title, description);
-    elements.messageArea.appendChild(wrapper);
     return;
   }
 
@@ -590,36 +550,55 @@ function renderMessages() {
     );
   });
 
-  scrollToBottom();
+  scrollMessagesToBottom();
 }
 
 function createMessageElement(message) {
   const article = document.createElement("article");
   article.className = "message";
 
+  const isOwnMessage = message.sender_id === state.user.id;
+
+  if (isOwnMessage) {
+    article.classList.add("own-message");
+  }
+
+  const profile = Array.isArray(message.profiles)
+    ? message.profiles[0]
+    : message.profiles;
+
+  const displayName =
+    profile?.display_name ||
+    profile?.username ||
+    "Unknown User";
+
   const avatar = document.createElement("div");
-  avatar.className = "avatar avatar-blue";
-  avatar.textContent = getInitial(message.author);
+  avatar.className = isOwnMessage
+    ? "avatar avatar-blue"
+    : "avatar avatar-purple";
 
-  const body = document.createElement("div");
+  avatar.textContent = getInitial(displayName);
 
-  const meta = document.createElement("div");
-  meta.className = "message-meta";
+  const content = document.createElement("div");
+  content.className = "message-content";
+
+  const metadata = document.createElement("div");
+  metadata.className = "message-meta";
 
   const author = document.createElement("strong");
-  author.textContent = message.author;
+  author.textContent = displayName;
 
   const time = document.createElement("time");
-  time.dateTime = message.createdAt;
-  time.textContent = formatTime(message.createdAt);
+  time.dateTime = message.created_at;
+  time.textContent = formatTime(message.created_at);
 
   const bubble = document.createElement("div");
   bubble.className = "message-bubble";
-  bubble.textContent = message.text;
+  bubble.textContent = message.content;
 
-  meta.append(author, time);
-  body.append(meta, bubble);
-  article.append(avatar, body);
+  metadata.append(author, time);
+  content.append(metadata, bubble);
+  article.append(avatar, content);
 
   return article;
 }
@@ -637,31 +616,286 @@ function formatTime(value) {
   }).format(date);
 }
 
-function sendMessage() {
-  const text = elements.messageInput.value.trim();
+async function sendMessage() {
+  const content = elements.messageInput.value.trim();
 
-  if (!text || !state.selectedType) {
+  if (!content || !state.selectedChannel) {
     return;
   }
 
-  const key = getConversationKey();
+  elements.sendButton.disabled = true;
 
-  if (!Array.isArray(state.messages[key])) {
-    state.messages[key] = [];
+  const { error } = await supabaseClient
+    .from("server_messages")
+    .insert({
+      channel_id: state.selectedChannel.id,
+      sender_id: state.user.id,
+      content: content.slice(0, 2000)
+    });
+
+  if (error) {
+    console.error("Message sending failed:", error);
+    window.alert(`Message could not be sent: ${error.message}`);
+    elements.sendButton.disabled = false;
+    return;
   }
-
-  state.messages[key].push({
-    id: createId("message"),
-    author: state.username,
-    text: text.slice(0, 2000),
-    createdAt: new Date().toISOString()
-  });
 
   elements.messageInput.value = "";
   updateComposer();
-  saveState();
-  renderMessages();
-  scrollToBottom();
+}
+
+function subscribeToMessages(channelId) {
+  removeMessageSubscription();
+
+  state.messageSubscription = supabaseClient
+    .channel(`channel-messages-${channelId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "server_messages",
+        filter: `channel_id=eq.${channelId}`
+      },
+      () => {
+        loadMessages();
+      }
+    )
+    .subscribe();
+}
+
+function removeMessageSubscription() {
+  if (!state.messageSubscription) {
+    return;
+  }
+
+  supabaseClient.removeChannel(state.messageSubscription);
+  state.messageSubscription = null;
+}
+
+async function showDiscoverServers() {
+  hideNavigationViews();
+  elements.discoverNavigation.hidden = false;
+
+  elements.navigationTitle.textContent = "Discover";
+  elements.navigationSubtitle.textContent = "Public communities";
+  elements.discoverList.innerHTML =
+    '<p class="empty-navigation-text">Loading servers...</p>';
+
+  await loadServers();
+
+  const publicServers = state.servers.filter(
+    (server) => server.visibility === "public"
+  );
+
+  elements.discoverList.replaceChildren();
+
+  if (publicServers.length === 0) {
+    elements.discoverList.appendChild(
+      createTextElement(
+        "p",
+        "empty-navigation-text",
+        "No public servers are available yet."
+      )
+    );
+    return;
+  }
+
+  publicServers.forEach((server) => {
+    const card = document.createElement("article");
+    card.className = "discover-card";
+
+    const title = document.createElement("h3");
+    title.textContent = server.name;
+
+    const description = document.createElement("p");
+    description.textContent =
+      server.description || "No description provided.";
+
+    const button = document.createElement("button");
+    button.type = "button";
+
+    const joined = isServerMember(server.id);
+    button.textContent = joined ? "Open Server" : "Join Server";
+
+    button.addEventListener("click", async () => {
+      if (joined) {
+        await openServer(server.id);
+      } else {
+        await joinServer(server.id);
+      }
+    });
+
+    card.append(title, description, button);
+    elements.discoverList.appendChild(card);
+  });
+
+  closeNavigation();
+}
+
+async function joinServer(serverId) {
+  const { error } = await supabaseClient
+    .from("server_members")
+    .insert({
+      server_id: serverId,
+      user_id: state.user.id,
+      role: "member"
+    });
+
+  if (error) {
+    window.alert(`Server could not be joined: ${error.message}`);
+    return;
+  }
+
+  await loadServers();
+  await openServer(serverId);
+}
+
+function openCreateServerModal() {
+  elements.serverNameInput.value = "";
+  elements.serverDescriptionInput.value = "";
+  elements.publicServerInput.checked = true;
+  setFormMessage(elements.createServerMessage, "");
+
+  elements.createServerModal.showModal();
+
+  requestAnimationFrame(() => {
+    elements.serverNameInput.focus();
+  });
+}
+
+function closeCreateServerModal() {
+  if (elements.createServerModal.open) {
+    elements.createServerModal.close();
+  }
+}
+
+async function createServer(event) {
+  event.preventDefault();
+
+  const name = elements.serverNameInput.value.trim();
+  const description =
+    elements.serverDescriptionInput.value.trim();
+
+  setFormMessage(
+    elements.createServerMessage,
+    "Creating server..."
+  );
+
+  const { data, error } = await supabaseClient
+    .from("servers")
+    .insert({
+      owner_id: state.user.id,
+      name,
+      description,
+      visibility: elements.publicServerInput.checked
+        ? "public"
+        : "private"
+    })
+    .select()
+    .single();
+
+  if (error) {
+    setFormMessage(
+      elements.createServerMessage,
+      error.message,
+      "error"
+    );
+    return;
+  }
+
+  setFormMessage(
+    elements.createServerMessage,
+    "Server created.",
+    "success"
+  );
+
+  closeCreateServerModal();
+  await loadServers();
+  await openServer(data.id);
+}
+
+function openProfileModal() {
+  if (!state.profile) {
+    return;
+  }
+
+  elements.profileDisplayNameInput.value =
+    state.profile.display_name;
+
+  elements.profileBioInput.value = state.profile.bio || "";
+  setFormMessage(elements.profileMessage, "");
+
+  elements.profileModal.showModal();
+}
+
+function closeProfileModal() {
+  if (elements.profileModal.open) {
+    elements.profileModal.close();
+  }
+}
+
+async function saveProfile(event) {
+  event.preventDefault();
+
+  const displayName =
+    elements.profileDisplayNameInput.value.trim();
+
+  const bio = elements.profileBioInput.value.trim();
+
+  setFormMessage(elements.profileMessage, "Saving profile...");
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .update({
+      display_name: displayName,
+      bio
+    })
+    .eq("id", state.user.id)
+    .select()
+    .single();
+
+  if (error) {
+    setFormMessage(
+      elements.profileMessage,
+      error.message,
+      "error"
+    );
+    return;
+  }
+
+  state.profile = data;
+  renderProfile();
+
+  setFormMessage(
+    elements.profileMessage,
+    "Profile saved.",
+    "success"
+  );
+
+  closeProfileModal();
+}
+
+async function signOut() {
+  removeMessageSubscription();
+
+  const { error } = await supabaseClient.auth.signOut();
+
+  if (error) {
+    window.alert(`Sign out failed: ${error.message}`);
+    return;
+  }
+
+  state.session = null;
+  state.user = null;
+  state.profile = null;
+  state.servers = [];
+  state.memberships = [];
+  state.channels = [];
+  state.selectedServer = null;
+  state.selectedChannel = null;
+
+  showScreen("landing");
 }
 
 function updateComposer() {
@@ -677,254 +911,11 @@ function updateComposer() {
     `${Math.min(elements.messageInput.scrollHeight, 150)}px`;
 }
 
-function scrollToBottom() {
+function scrollMessagesToBottom() {
   requestAnimationFrame(() => {
     elements.messageArea.scrollTop =
       elements.messageArea.scrollHeight;
   });
-}
-
-function openCreateModal(mode) {
-  state.createMode = mode;
-  elements.createNameInput.value = "";
-  elements.createError.textContent = "";
-
-  if (mode === "direct") {
-    elements.createTitle.textContent = "New Direct Message";
-    elements.createDescription.textContent =
-      "Create a local direct conversation.";
-    elements.createLabel.textContent = "Display Name";
-    elements.createNameInput.placeholder = "Enter a name";
-    elements.createHint.textContent =
-      "Online user search will be added later.";
-  }
-
-  if (mode === "group") {
-    elements.createTitle.textContent = "Create Private Group";
-    elements.createDescription.textContent =
-      "Private groups support up to 15 people.";
-    elements.createLabel.textContent = "Group Name";
-    elements.createNameInput.placeholder = "Enter a group name";
-    elements.createHint.textContent =
-      "You will be the first member.";
-  }
-
-  if (mode === "server") {
-    elements.createTitle.textContent = "Create Server";
-    elements.createDescription.textContent =
-      "Create an open community with a general channel.";
-    elements.createLabel.textContent = "Server Name";
-    elements.createNameInput.placeholder =
-      "ColloTalk Official OpenChat";
-    elements.createHint.textContent =
-      "The server will be stored on this device.";
-  }
-
-  elements.createModal.showModal();
-
-  requestAnimationFrame(() => {
-    elements.createNameInput.focus();
-  });
-}
-
-function closeCreateModal() {
-  if (elements.createModal.open) {
-    elements.createModal.close();
-  }
-
-  state.createMode = null;
-}
-
-function createItem() {
-  const name = elements.createNameInput.value.trim();
-
-  if (!name) {
-    elements.createError.textContent = "Enter a name.";
-    return;
-  }
-
-  if (state.createMode === "direct") {
-    const item = {
-      id: createId("direct"),
-      name: name.slice(0, 50)
-    };
-
-    state.directs.push(item);
-    state.selectedType = "direct";
-    state.selectedId = item.id;
-    state.selectedServerId = null;
-  }
-
-  if (state.createMode === "group") {
-    const item = {
-      id: createId("group"),
-      name: name.slice(0, 50),
-      memberCount: 1
-    };
-
-    state.groups.push(item);
-    state.selectedType = "group";
-    state.selectedId = item.id;
-    state.selectedServerId = null;
-  }
-
-  if (state.createMode === "server") {
-    const server = {
-      id: createId("server"),
-      name: name.slice(0, 50),
-      shortName: getServerShortName(name),
-      description: "A community server created with ColloTalk.",
-      channels: [
-        {
-          id: createId("channel"),
-          name: "general"
-        }
-      ]
-    };
-
-    state.servers.push(server);
-    state.selectedType = "server";
-    state.selectedServerId = server.id;
-    state.selectedId = server.channels[0].id;
-  }
-
-  saveState();
-  closeCreateModal();
-  renderApplication();
-}
-
-function openProfileModal() {
-  elements.profileNameInput.value =
-    state.username === "Guest" ? "" : state.username;
-
-  elements.profileError.textContent = "";
-  elements.profileModal.showModal();
-
-  requestAnimationFrame(() => {
-    elements.profileNameInput.focus();
-  });
-}
-
-function closeProfileModal() {
-  if (elements.profileModal.open) {
-    elements.profileModal.close();
-  }
-}
-
-function saveProfile() {
-  const name = elements.profileNameInput.value.trim();
-
-  if (!name) {
-    elements.profileError.textContent =
-      "Enter a display name.";
-    return;
-  }
-
-  state.username = name.slice(0, 24);
-
-  saveState();
-  updateProfile();
-  closeProfileModal();
-}
-
-function deleteCurrentItem() {
-  if (!state.selectedType) {
-    return;
-  }
-
-  const confirmed = window.confirm(
-    "Delete the current local conversation?"
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  const key = getConversationKey();
-  delete state.messages[key];
-
-  if (state.selectedType === "direct") {
-    state.directs = state.directs.filter(
-      (item) => item.id !== state.selectedId
-    );
-  }
-
-  if (state.selectedType === "group") {
-    state.groups = state.groups.filter(
-      (item) => item.id !== state.selectedId
-    );
-  }
-
-  if (state.selectedType === "server") {
-    state.servers = state.servers.filter(
-      (item) => item.id !== state.selectedServerId
-    );
-  }
-
-  resetSelection();
-  saveState();
-  renderApplication();
-}
-
-function openPlansModal() {
-  if (!elements.plansModal.open) {
-    elements.plansModal.showModal();
-  }
-}
-
-function closePlansModal() {
-  if (elements.plansModal.open) {
-    elements.plansModal.close();
-  }
-}
-
-function setPlanMode(familyMode) {
-  state.familyMode = familyMode;
-
-  elements.individualPlansButton.classList.toggle(
-    "active",
-    !familyMode
-  );
-
-  elements.familyPlansButton.classList.toggle(
-    "active",
-    familyMode
-  );
-
-  document
-    .querySelectorAll(".dynamic-plan-detail")
-    .forEach((detail) => {
-      const parent = detail.closest(".plan-price");
-
-      detail.textContent = familyMode
-        ? parent.dataset.family
-        : parent.dataset.individual;
-    });
-
-  document
-    .querySelectorAll("[data-plan]")
-    .forEach((button) => {
-      const basePlan = button.dataset.plan;
-
-      button.textContent = familyMode
-        ? `Preview ${basePlan} Family`
-        : `Preview ${basePlan.replace("Collo ", "")}`;
-    });
-}
-
-function openPreview(title, description) {
-  elements.previewTitle.textContent = title;
-  elements.previewDescription.textContent = description;
-
-  if (!elements.previewModal.open) {
-    elements.previewModal.showModal();
-  }
-}
-
-function closePreview() {
-  if (elements.previewModal.open) {
-    elements.previewModal.close();
-  }
 }
 
 function openNavigation() {
@@ -937,49 +928,70 @@ function closeNavigation() {
   elements.mobileOverlay.classList.remove("visible");
 }
 
-function setUpEvents() {
-  elements.openAppButton.addEventListener(
-    "click",
-    showApplication
+function createTextElement(tag, className, text) {
+  const element = document.createElement(tag);
+  element.className = className;
+  element.textContent = text;
+  return element;
+}
+
+function escapeHtml(value) {
+  const element = document.createElement("div");
+  element.textContent = String(value || "");
+  return element.innerHTML;
+}
+
+function setUpEventListeners() {
+  elements.getStartedButton.addEventListener("click", () => {
+    setAuthMode("signup");
+    showScreen("auth");
+  });
+
+  elements.signInButton.addEventListener("click", () => {
+    setAuthMode("signin");
+    showScreen("auth");
+  });
+
+  elements.authBackButton.addEventListener("click", () => {
+    showScreen("landing");
+  });
+
+  elements.authSwitchButton.addEventListener("click", () => {
+    setAuthMode(
+      state.authMode === "signup" ? "signin" : "signup"
+    );
+  });
+
+  elements.authForm.addEventListener(
+    "submit",
+    handleAuthentication
   );
 
-  elements.openPlansButton.addEventListener("click", () => {
-    elements.appShell.hidden = false;
-    openPlansModal();
-  });
+  elements.homeButton.addEventListener("click", renderHome);
 
-  elements.skipWelcomeButton.addEventListener("click", () => {
-    localStorage.setItem(WELCOME_KEY, "true");
-    showApplication();
-  });
-
-  elements.homeButton.addEventListener("click", showHome);
-
-  elements.addDirectButton.addEventListener("click", () => {
-    openCreateModal("direct");
-  });
-
-  elements.addGroupButton.addEventListener("click", () => {
-    openCreateModal("group");
-  });
-
-  elements.addServerButton.addEventListener("click", () => {
-    openCreateModal("server");
-  });
-
-  elements.createForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    createItem();
-  });
-
-  elements.closeCreateButton.addEventListener(
+  elements.discoverServersButton.addEventListener(
     "click",
-    closeCreateModal
+    showDiscoverServers
   );
 
-  elements.cancelCreateButton.addEventListener(
+  elements.addServerButton.addEventListener(
     "click",
-    closeCreateModal
+    openCreateServerModal
+  );
+
+  elements.createServerForm.addEventListener(
+    "submit",
+    createServer
+  );
+
+  elements.closeCreateServerButton.addEventListener(
+    "click",
+    closeCreateServerModal
+  );
+
+  elements.cancelCreateServerButton.addEventListener(
+    "click",
+    closeCreateServerModal
   );
 
   elements.profileButton.addEventListener(
@@ -987,10 +999,10 @@ function setUpEvents() {
     openProfileModal
   );
 
-  elements.profileForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    saveProfile();
-  });
+  elements.profileForm.addEventListener(
+    "submit",
+    saveProfile
+  );
 
   elements.closeProfileButton.addEventListener(
     "click",
@@ -1001,6 +1013,8 @@ function setUpEvents() {
     "click",
     closeProfileModal
   );
+
+  elements.signOutButton.addEventListener("click", signOut);
 
   elements.messageForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -1026,71 +1040,6 @@ function setUpEvents() {
     }
   );
 
-  elements.deleteButton.addEventListener(
-    "click",
-    deleteCurrentItem
-  );
-
-  elements.plansNavigationButton.addEventListener(
-    "click",
-    openPlansModal
-  );
-
-  elements.profilePlanButton.addEventListener(
-    "click",
-    openPlansModal
-  );
-
-  elements.closePlansButton.addEventListener(
-    "click",
-    closePlansModal
-  );
-
-  elements.individualPlansButton.addEventListener(
-    "click",
-    () => {
-      setPlanMode(false);
-    }
-  );
-
-  elements.familyPlansButton.addEventListener(
-    "click",
-    () => {
-      setPlanMode(true);
-    }
-  );
-
-  document
-    .querySelectorAll("[data-plan]")
-    .forEach((button) => {
-      button.addEventListener("click", () => {
-        const basePlan = button.dataset.plan;
-
-        const planName = state.familyMode
-          ? `${basePlan} Family`
-          : basePlan;
-
-        openPreview(
-          planName,
-          state.familyMode
-            ? "This family plan will support up to four independent accounts for the price of three individual subscriptions. Payments are not active yet."
-            : "Subscriptions and payments are not active in this prototype. This screen currently previews the planned membership experience."
-        );
-      });
-    });
-
-  elements.giftPreviewButton.addEventListener("click", () => {
-    openPreview(
-      "Collo Gifts",
-      "Collo Plus and Collo Pro will be giftable to another user. Gift subscriptions will not renew automatically."
-    );
-  });
-
-  elements.closePreviewButton.addEventListener(
-    "click",
-    closePreview
-  );
-
   elements.menuButton.addEventListener(
     "click",
     openNavigation
@@ -1107,20 +1056,35 @@ function setUpEvents() {
   );
 }
 
-function initialize() {
-  loadState();
-  setUpEvents();
-  renderApplication();
+async function initializeApplication() {
+  setUpEventListeners();
   updateComposer();
-  setPlanMode(false);
-  initializeEntryScreen();
 
-  if (
-    state.username === "Guest" &&
-    localStorage.getItem(WELCOME_KEY) === "true"
-  ) {
-    openProfileModal();
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (session) {
+    await startAuthenticatedApplication(session);
+  } else {
+    showScreen("landing");
   }
+
+  supabaseClient.auth.onAuthStateChange(
+    async (event, currentSession) => {
+      if (
+        event === "SIGNED_IN" &&
+        currentSession &&
+        currentSession.user.id !== state.user?.id
+      ) {
+        await startAuthenticatedApplication(currentSession);
+      }
+
+      if (event === "SIGNED_OUT") {
+        showScreen("landing");
+      }
+    }
+  );
 }
 
-initialize();
+initializeApplication();
