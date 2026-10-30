@@ -6,7 +6,7 @@
 
 A clean, lightweight, and responsive chat application built for effortless communication across desktop, tablet, and mobile devices.
 
-# Check here!!👉 **https://heowoibleriemc.github.io/ColloTalk/**
+# Check here!!👇 **https://heowoibleriemc.github.io/ColloTalk/**
 
 <br>
 
