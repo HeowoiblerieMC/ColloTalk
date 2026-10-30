@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -10,34 +10,34 @@
     name="description"
     content="ColloTalk is a modern chat platform for direct messages, private groups, and community servers."
   >
-  <meta name="theme-color" content="#090b11">
+  <meta name="theme-color" content="#080a0f">
   <title>ColloTalk</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <div class="app">
-    <aside class="rail" id="rail">
+    <aside class="server-rail" id="serverRail">
       <button
-        class="rail-logo active"
+        class="home-button active"
+        id="homeButton"
         type="button"
-        data-view="home"
-        aria-label="Open ColloTalk home"
-        title="ColloTalk Home"
+        aria-label="Open home"
+        title="Home"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3a4.5 4.5 0 0 1-4.5 4.5H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+          <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
         </svg>
       </button>
 
       <div class="rail-divider"></div>
 
-      <div class="server-buttons" id="serverButtons"></div>
+      <div class="server-list" id="serverList"></div>
 
       <button
-        class="rail-button add-button"
-        id="createServerButton"
+        class="add-server-button"
+        id="addServerButton"
         type="button"
-        aria-label="Create a server"
+        aria-label="Create server"
         title="Create Server"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -46,24 +46,16 @@
       </button>
     </aside>
 
-    <aside class="sidebar" id="sidebar">
-      <header class="sidebar-header">
-        <div class="brand">
-          <div class="brand-mark">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3a4.5 4.5 0 0 1-4.5 4.5H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
-            </svg>
-          </div>
-
-          <div class="brand-text">
-            <h1 id="sidebarTitle">ColloTalk</h1>
-            <p id="sidebarSubtitle">Simple conversations</p>
-          </div>
+    <aside class="navigation-panel" id="navigationPanel">
+      <header class="navigation-header">
+        <div>
+          <h1 id="navigationTitle">ColloTalk</h1>
+          <p id="navigationSubtitle">Simple conversations</p>
         </div>
 
         <button
-          class="icon-button sidebar-close-button"
-          id="closeSidebarButton"
+          class="icon-button mobile-close-button"
+          id="closeNavigationButton"
           type="button"
           aria-label="Close navigation"
         >
@@ -73,35 +65,33 @@
         </button>
       </header>
 
-      <div class="sidebar-content">
-        <div id="homeNavigation">
-          <nav class="main-navigation" aria-label="Main navigation">
-            <button class="navigation-button active" type="button">
+      <div class="navigation-content">
+        <div id="homeContent">
+          <nav class="main-links" aria-label="Main navigation">
+            <button class="main-link active" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM17 8h4M19 6v4"/>
               </svg>
-              Friends
+              <span>Friends</span>
             </button>
 
-            <button class="navigation-button" type="button">
+            <button class="main-link" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 5h14v10H9l-4 4V5Z"/>
               </svg>
-              Message Requests
-              <span class="navigation-badge">2</span>
+              <span>Message Requests</span>
             </button>
           </nav>
 
-          <section class="conversation-section">
-            <div class="section-title">
+          <section class="navigation-section">
+            <div class="section-heading">
               <span>Direct Messages</span>
 
               <button
-                class="small-icon-button"
-                id="createDirectButton"
+                class="small-button"
+                id="addDirectButton"
                 type="button"
-                aria-label="Start a direct message"
-                title="New Direct Message"
+                aria-label="Start direct message"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 5v14M5 12h14"/>
@@ -109,19 +99,20 @@
               </button>
             </div>
 
-            <div class="conversation-list" id="directList"></div>
+            <div class="item-list" id="directList">
+              <p class="empty-list">No direct messages yet.</p>
+            </div>
           </section>
 
-          <section class="conversation-section">
-            <div class="section-title">
+          <section class="navigation-section">
+            <div class="section-heading">
               <span>Private Groups</span>
 
               <button
-                class="small-icon-button"
-                id="createGroupButton"
+                class="small-button"
+                id="addGroupButton"
                 type="button"
-                aria-label="Create a private group"
-                title="New Private Group"
+                aria-label="Create private group"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 5v14M5 12h14"/>
@@ -129,44 +120,43 @@
               </button>
             </div>
 
-            <div class="conversation-list" id="groupList"></div>
+            <div class="item-list" id="groupList">
+              <p class="empty-list">No private groups yet.</p>
+            </div>
           </section>
         </div>
 
-        <div id="serverNavigation" hidden>
-          <div class="server-overview">
-            <p id="serverDescription"></p>
-          </div>
-
-          <div id="channelCategories"></div>
+        <div id="serverContent" hidden>
+          <p class="server-description" id="serverDescription"></p>
+          <div id="channelList"></div>
         </div>
       </div>
 
       <footer class="profile-bar">
         <div class="avatar avatar-blue" id="profileAvatar">G</div>
 
-        <button class="profile-information" id="profileButton" type="button">
+        <button class="profile-button" id="profileButton" type="button">
           <strong id="profileName">Guest</strong>
-          <span id="profileStatus">Local prototype</span>
+          <span>Local prototype</span>
         </button>
 
         <button
           class="icon-button"
           id="settingsButton"
           type="button"
-          aria-label="Open settings"
-          title="Settings"
+          aria-label="Edit profile"
+          title="Edit Profile"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5ZM19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-5L9 6.1a7 7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.5 3.1h5l.5-3.1a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5a7 7 0 0 0 .1-1Z"/>
+            <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3-.1-1l2-1.5-2-3.4-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-5L9 6.1a7 7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.5 3.1h5l.5-3.1a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5a7 7 0 0 0 .1-1Z"/>
           </svg>
         </button>
       </footer>
     </aside>
 
-    <main class="chat">
+    <main class="chat-panel">
       <header class="chat-header">
-        <div class="chat-header-main">
+        <div class="chat-header-left">
           <button
             class="icon-button menu-button"
             id="menuButton"
@@ -178,71 +168,54 @@
             </svg>
           </button>
 
-          <div class="avatar avatar-purple" id="chatAvatar">A</div>
+          <div class="chat-icon" id="chatIcon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+            </svg>
+          </div>
 
-          <div class="chat-heading">
-            <h2 id="chatTitle">Alice</h2>
-
-            <p>
-              <span class="status-dot" id="chatStatusDot"></span>
-              <span id="chatSubtitle">Direct message</span>
-            </p>
+          <div>
+            <h2 id="chatTitle">Welcome to ColloTalk</h2>
+            <p id="chatSubtitle">Create a conversation to get started</p>
           </div>
         </div>
 
-        <div class="header-actions">
-          <button
-            class="icon-button"
-            id="detailsButton"
-            type="button"
-            aria-label="Open conversation details"
-            title="Conversation Details"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 11v6M12 7.5h.01"/>
-            </svg>
-          </button>
-
-          <button
-            class="icon-button"
-            id="clearButton"
-            type="button"
-            aria-label="Clear local messages"
-            title="Clear Local Messages"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/>
-            </svg>
-          </button>
-        </div>
+        <button
+          class="icon-button"
+          id="deleteButton"
+          type="button"
+          aria-label="Delete current conversation"
+          title="Delete"
+          hidden
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/>
+          </svg>
+        </button>
       </header>
 
-      <section
-        class="message-area"
-        id="messageArea"
-        aria-label="Messages"
-        aria-live="polite"
-      ></section>
-
-      <footer class="composer">
-        <form class="message-form" id="messageForm">
-          <button
-            class="attachment-button"
-            type="button"
-            aria-label="Add attachment"
-            title="Attachments are not available yet"
-          >
+      <section class="message-area" id="messageArea" aria-live="polite">
+        <div class="welcome-state" id="welcomeState">
+          <div class="welcome-icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m9 12 5.5-5.5a3 3 0 1 1 4.2 4.2l-7 7a5 5 0 0 1-7.1-7.1l7.4-7.4"/>
+              <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
             </svg>
-          </button>
+          </div>
 
+          <h3>Your conversations start here</h3>
+          <p>
+            Create a direct message, private group, or community server.
+          </p>
+        </div>
+      </section>
+
+      <footer class="composer" id="composer" hidden>
+        <form class="message-form" id="messageForm">
           <textarea
             id="messageInput"
             rows="1"
             maxlength="2000"
-            placeholder="Message Alice"
+            placeholder="Write a message"
             aria-label="Message"
           ></textarea>
 
@@ -260,95 +233,26 @@
         </form>
 
         <div class="composer-details">
-          <span>Enter to send, Shift + Enter for a new line</span>
+          <span>Enter to send</span>
           <span id="characterCount">0 / 2000</span>
         </div>
       </footer>
     </main>
-
-    <aside class="details-panel" id="detailsPanel">
-      <header class="details-header">
-        <h2>Details</h2>
-
-        <button
-          class="icon-button"
-          id="closeDetailsButton"
-          type="button"
-          aria-label="Close details"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m6 6 12 12M18 6 6 18"/>
-          </svg>
-        </button>
-      </header>
-
-      <div class="details-content" id="detailsContent"></div>
-    </aside>
   </div>
 
-  <div class="mobile-overlay" id="mobileOverlay"></div>
-
-  <dialog class="modal" id="profileModal">
-    <form class="modal-card" id="profileForm">
-      <div class="modal-heading">
-        <div>
-          <h2>Edit Profile</h2>
-          <p>Choose the name displayed with your local messages.</p>
-        </div>
-
-        <button
-          class="icon-button"
-          id="closeProfileModalButton"
-          type="button"
-          aria-label="Close profile editor"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m6 6 12 12M18 6 6 18"/>
-          </svg>
-        </button>
-      </div>
-
-      <label for="usernameInput">Display Name</label>
-
-      <input
-        id="usernameInput"
-        type="text"
-        minlength="1"
-        maxlength="24"
-        placeholder="Enter your display name"
-        autocomplete="nickname"
-        required
-      >
-
-      <p class="form-error" id="profileError"></p>
-
-      <div class="modal-actions">
-        <button
-          class="secondary-button"
-          id="cancelProfileButton"
-          type="button"
-        >
-          Cancel
-        </button>
-
-        <button class="primary-button" type="submit">
-          Save Profile
-        </button>
-      </div>
-    </form>
-  </dialog>
+  <div class="overlay" id="overlay"></div>
 
   <dialog class="modal" id="createModal">
     <form class="modal-card" id="createForm">
-      <div class="modal-heading">
+      <div class="modal-header">
         <div>
-          <h2 id="createModalTitle">Create</h2>
-          <p id="createModalDescription"></p>
+          <h2 id="createTitle">Create</h2>
+          <p id="createDescription"></p>
         </div>
 
         <button
           class="icon-button"
-          id="closeCreateModalButton"
+          id="closeCreateButton"
           type="button"
           aria-label="Close"
         >
@@ -358,13 +262,12 @@
         </button>
       </div>
 
-      <label for="createNameInput" id="createNameLabel">Name</label>
+      <label for="createNameInput" id="createLabel">Name</label>
 
       <input
         id="createNameInput"
         type="text"
-        minlength="1"
-        maxlength="40"
+        maxlength="50"
         required
       >
 
@@ -387,31 +290,53 @@
     </form>
   </dialog>
 
-  <dialog class="modal" id="clearModal">
-    <form class="modal-card" id="clearForm">
-      <div class="modal-heading">
+  <dialog class="modal" id="profileModal">
+    <form class="modal-card" id="profileForm">
+      <div class="modal-header">
         <div>
-          <h2>Clear Local Messages?</h2>
-          <p>This removes the locally stored messages in the current conversation.</p>
+          <h2>Edit Profile</h2>
+          <p>Choose the name displayed with your messages.</p>
         </div>
+
+        <button
+          class="icon-button"
+          id="closeProfileButton"
+          type="button"
+          aria-label="Close"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18"/>
+          </svg>
+        </button>
       </div>
+
+      <label for="profileNameInput">Display Name</label>
+
+      <input
+        id="profileNameInput"
+        type="text"
+        maxlength="24"
+        required
+      >
+
+      <p class="form-error" id="profileError"></p>
 
       <div class="modal-actions">
         <button
           class="secondary-button"
-          id="cancelClearButton"
+          id="cancelProfileButton"
           type="button"
         >
           Cancel
         </button>
 
-        <button class="danger-button" type="submit">
-          Clear Messages
+        <button class="primary-button" type="submit">
+          Save
         </button>
       </div>
     </form>
   </dialog>
 
-  <script src="app.js"></script>
+    <script src="./app.js"></script>
 </body>
 </html>
