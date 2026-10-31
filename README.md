@@ -11,7 +11,7 @@ A clean, lightweight, and responsive chat application built for effortless commu
 <br>
 
 ![Status](https://img.shields.io/badge/status-in%20development-7c3aed?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-0.1.6-2563eb?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-1.5.4-2563eb?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-16a34a?style=for-the-badge)
 
 </div>
