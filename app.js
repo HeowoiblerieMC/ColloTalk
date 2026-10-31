@@ -4,59 +4,64 @@ const SUPABASE_URL = "https://mvollazjrwebwqkpqagqk.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_mrDiTI54EOV0agHDCJJ2jQ_epAqSxXC";
 
-const supabaseClient = window.supabase.createClient(
+const { createClient } = window.supabase;
+
+const supabaseClient = createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
 
 const state = {
-  authMode: "signup",
   session: null,
   user: null,
   profile: null,
   servers: [],
-  memberships: [],
-  channels: [],
   selectedServer: null,
+  channels: [],
   selectedChannel: null,
-  messageSubscription: null
+  messages: [],
+  membership: null,
+  realtimeChannel: null
 };
 
 const elements = {
   landingScreen: document.getElementById("landingScreen"),
   authScreen: document.getElementById("authScreen"),
+  confirmationScreen: document.getElementById("confirmationScreen"),
   appShell: document.getElementById("appShell"),
+  connectionStatus: document.getElementById("connectionStatus"),
   getStartedButton: document.getElementById("getStartedButton"),
-  signInButton: document.getElementById("signInButton"),
+  signInLandingButton: document.getElementById("signInLandingButton"),
   authBackButton: document.getElementById("authBackButton"),
-  authForm: document.getElementById("authForm"),
-  authEyebrow: document.getElementById("authEyebrow"),
-  authTitle: document.getElementById("authTitle"),
-  authDescription: document.getElementById("authDescription"),
-  signupFields: document.getElementById("signupFields"),
-  usernameInput: document.getElementById("usernameInput"),
-  displayNameInput: document.getElementById("displayNameInput"),
-  emailInput: document.getElementById("emailInput"),
-  passwordInput: document.getElementById("passwordInput"),
-  authMessage: document.getElementById("authMessage"),
-  authSubmitButton: document.getElementById("authSubmitButton"),
-  authSwitchButton: document.getElementById("authSwitchButton"),
+  signInTab: document.getElementById("signInTab"),
+  signUpTab: document.getElementById("signUpTab"),
+  signInForm: document.getElementById("signInForm"),
+  signUpForm: document.getElementById("signUpForm"),
+  signInEmail: document.getElementById("signInEmail"),
+  signInPassword: document.getElementById("signInPassword"),
+  signInMessage: document.getElementById("signInMessage"),
+  signUpUsername: document.getElementById("signUpUsername"),
+  signUpDisplayName: document.getElementById("signUpDisplayName"),
+  signUpEmail: document.getElementById("signUpEmail"),
+  signUpPassword: document.getElementById("signUpPassword"),
+  signUpMessage: document.getElementById("signUpMessage"),
+  confirmationEmail: document.getElementById("confirmationEmail"),
+  returnToSignInButton: document.getElementById("returnToSignInButton"),
   homeButton: document.getElementById("homeButton"),
   serverList: document.getElementById("serverList"),
-  addServerButton: document.getElementById("addServerButton"),
+  createServerButton: document.getElementById("createServerButton"),
+  refreshServersButton: document.getElementById("refreshServersButton"),
   navigationTitle: document.getElementById("navigationTitle"),
   navigationSubtitle: document.getElementById("navigationSubtitle"),
   homeNavigation: document.getElementById("homeNavigation"),
   serverNavigation: document.getElementById("serverNavigation"),
-  discoverNavigation: document.getElementById("discoverNavigation"),
   serverDescription: document.getElementById("serverDescription"),
+  joinServerButton: document.getElementById("joinServerButton"),
+  createChannelButton: document.getElementById("createChannelButton"),
   channelList: document.getElementById("channelList"),
-  discoverServersButton: document.getElementById("discoverServersButton"),
-  discoverList: document.getElementById("discoverList"),
   profileAvatar: document.getElementById("profileAvatar"),
-  profileName: document.getElementById("profileName"),
+  profileDisplayName: document.getElementById("profileDisplayName"),
   profileUsername: document.getElementById("profileUsername"),
-  profileButton: document.getElementById("profileButton"),
   signOutButton: document.getElementById("signOutButton"),
   chatIcon: document.getElementById("chatIcon"),
   chatTitle: document.getElementById("chatTitle"),
@@ -66,6 +71,7 @@ const elements = {
   messageForm: document.getElementById("messageForm"),
   messageInput: document.getElementById("messageInput"),
   sendButton: document.getElementById("sendButton"),
+  composerStatus: document.getElementById("composerStatus"),
   characterCount: document.getElementById("characterCount"),
   menuButton: document.getElementById("menuButton"),
   closeNavigationButton: document.getElementById("closeNavigationButton"),
@@ -74,362 +80,346 @@ const elements = {
   createServerForm: document.getElementById("createServerForm"),
   serverNameInput: document.getElementById("serverNameInput"),
   serverDescriptionInput: document.getElementById("serverDescriptionInput"),
-  publicServerInput: document.getElementById("publicServerInput"),
   createServerMessage: document.getElementById("createServerMessage"),
-  closeCreateServerButton: document.getElementById("closeCreateServerButton"),
-  cancelCreateServerButton: document.getElementById("cancelCreateServerButton"),
-  profileModal: document.getElementById("profileModal"),
-  profileForm: document.getElementById("profileForm"),
-  profileDisplayNameInput: document.getElementById(
-    "profileDisplayNameInput"
-  ),
-  profileBioInput: document.getElementById("profileBioInput"),
-  profileMessage: document.getElementById("profileMessage"),
-  closeProfileButton: document.getElementById("closeProfileButton"),
-  cancelProfileButton: document.getElementById("cancelProfileButton")
+  closeServerModalButton: document.getElementById("closeServerModalButton"),
+  cancelServerButton: document.getElementById("cancelServerButton"),
+  createChannelModal: document.getElementById("createChannelModal"),
+  createChannelForm: document.getElementById("createChannelForm"),
+  channelNameInput: document.getElementById("channelNameInput"),
+  createChannelMessage: document.getElementById("createChannelMessage"),
+  cancelChannelButton: document.getElementById("cancelChannelButton")
 };
 
-function showScreen(screenName) {
-  elements.landingScreen.hidden = screenName !== "landing";
-  elements.authScreen.hidden = screenName !== "auth";
-  elements.appShell.hidden = screenName !== "app";
+function showOnly(target) {
+  [
+    elements.landingScreen,
+    elements.authScreen,
+    elements.confirmationScreen,
+    elements.appShell
+  ].forEach((screen) => {
+    screen.hidden = screen !== target;
+  });
 }
 
-function setFormMessage(element, message, type = "") {
-  element.textContent = message;
-  element.className = "form-message";
-
-  if (type) {
-    element.classList.add(type);
-  }
-}
-
-function getInitial(value) {
-  const text = String(value || "").trim();
-
-  if (!text) {
-    return "?";
-  }
-
-  return Array.from(text)[0].toUpperCase();
-}
-
-function createServerShortName(name) {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-
-  if (words.length >= 2) {
-    return `${getInitial(words[0])}${getInitial(words[1])}`;
-  }
-
-  return Array.from(name.trim())
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+function showAuth(mode) {
+  showOnly(elements.authScreen);
+  setAuthMode(mode);
 }
 
 function setAuthMode(mode) {
-  state.authMode = mode;
-  const signup = mode === "signup";
+  const isSignIn = mode === "signin";
 
-  elements.signupFields.hidden = !signup;
-  elements.usernameInput.required = signup;
-  elements.displayNameInput.required = signup;
-
-  elements.passwordInput.autocomplete = signup
-    ? "new-password"
-    : "current-password";
-
-  elements.authEyebrow.textContent = signup
-    ? "CREATE ACCOUNT"
-    : "WELCOME BACK";
-
-  elements.authTitle.textContent = signup
-    ? "Join ColloTalk"
-    : "Sign in to ColloTalk";
-
-  elements.authDescription.textContent = signup
-    ? "Create an account and begin connecting."
-    : "Continue your conversations and communities.";
-
-  elements.authSubmitButton.textContent = signup
-    ? "Create Account"
-    : "Sign In";
-
-  elements.authSwitchButton.textContent = signup
-    ? "Already have an account? Sign in"
-    : "Need an account? Create one";
-
-  setFormMessage(elements.authMessage, "");
+  elements.signInTab.classList.toggle("active", isSignIn);
+  elements.signUpTab.classList.toggle("active", !isSignIn);
+  elements.signInForm.hidden = !isSignIn;
+  elements.signUpForm.hidden = isSignIn;
+  clearAuthMessages();
 }
 
-async function handleAuthentication(event) {
-  event.preventDefault();
+function clearAuthMessages() {
+  elements.signInMessage.textContent = "";
+  elements.signUpMessage.textContent = "";
+  elements.signInMessage.classList.remove("success");
+  elements.signUpMessage.classList.remove("success");
+}
 
-  const email = elements.emailInput.value.trim();
-  const password = elements.passwordInput.value;
+function setFormMessage(element, message, success = false) {
+  element.textContent = message;
+  element.classList.toggle("success", success);
+}
 
-  elements.authSubmitButton.disabled = true;
-  setFormMessage(elements.authMessage, "Connecting...");
-
+async function testConnection() {
   try {
-    if (state.authMode === "signup") {
-      const username = elements.usernameInput.value.trim();
-      const displayName = elements.displayNameInput.value.trim();
+    const { error } = await supabaseClient.auth.getSession();
 
-      if (!/^[A-Za-z0-9_]{3,24}$/.test(username)) {
-        throw new Error(
-          "Username must be 3 to 24 characters and use only letters, numbers, or underscores."
-        );
-      }
-
-      if (!displayName) {
-        throw new Error("Enter a display name.");
-      }
-
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-            display_name: displayName
-          }
-        }
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      if (!data.session) {
-        setFormMessage(
-          elements.authMessage,
-          "Account created. Check your email and confirm your account before signing in.",
-          "success"
-        );
-
-        setAuthMode("signin");
-        elements.emailInput.value = email;
-        return;
-      }
-
-      await startAuthenticatedApplication(data.session);
-    } else {
-      const { data, error } =
-        await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      await startAuthenticatedApplication(data.session);
+    if (error) {
+      throw error;
     }
-  } catch (error) {
-    setFormMessage(
-      elements.authMessage,
-      error.message || "Authentication failed.",
-      "error"
-    );
-  } finally {
-    elements.authSubmitButton.disabled = false;
+
+    elements.connectionStatus.textContent = "ColloTalk services are online";
+    elements.connectionStatus.classList.add("connected");
+  } catch {
+    elements.connectionStatus.textContent =
+      "ColloTalk could not connect to the online service";
+
+    elements.connectionStatus.classList.add("error");
   }
 }
 
-async function startAuthenticatedApplication(session) {
+async function signUp(event) {
+  event.preventDefault();
+
+  const username = elements.signUpUsername.value
+    .trim()
+    .toLowerCase();
+
+  const displayName = elements.signUpDisplayName.value.trim();
+  const email = elements.signUpEmail.value.trim();
+  const password = elements.signUpPassword.value;
+
+  if (!/^[a-z0-9_]{3,24}$/.test(username)) {
+    setFormMessage(
+      elements.signUpMessage,
+      "Use 3 to 24 lowercase letters, numbers, or underscores."
+    );
+    return;
+  }
+
+  setFormMessage(elements.signUpMessage, "Creating your account...", true);
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo:
+        "https://heowoibleriemc.github.io/ColloTalk/",
+      data: {
+        username,
+        display_name: displayName
+      }
+    }
+  });
+
+  if (error) {
+    setFormMessage(elements.signUpMessage, error.message);
+    return;
+  }
+
+  if (data.session) {
+    await enterApplication(data.session);
+    return;
+  }
+
+  elements.confirmationEmail.textContent = email;
+  showOnly(elements.confirmationScreen);
+}
+
+async function signIn(event) {
+  event.preventDefault();
+
+  const email = elements.signInEmail.value.trim();
+  const password = elements.signInPassword.value;
+
+  setFormMessage(elements.signInMessage, "Signing in...", true);
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+    setFormMessage(elements.signInMessage, error.message);
+    return;
+  }
+
+  await enterApplication(data.session);
+}
+
+async function signOut() {
+  await unsubscribeFromMessages();
+  await supabaseClient.auth.signOut();
+
+  state.session = null;
+  state.user = null;
+  state.profile = null;
+  state.servers = [];
+  state.selectedServer = null;
+  state.channels = [];
+  state.selectedChannel = null;
+  state.messages = [];
+  state.membership = null;
+
+  showOnly(elements.landingScreen);
+}
+
+async function enterApplication(session) {
   state.session = session;
   state.user = session.user;
 
-  setFormMessage(elements.authMessage, "");
-  showScreen("app");
+  showOnly(elements.appShell);
 
   await loadProfile();
   await loadServers();
-  renderHome();
+  renderHomeState();
 }
 
 async function loadProfile() {
   const { data, error } = await supabaseClient
     .from("profiles")
-    .select("*")
+    .select("id, username, display_name, avatar_url, plan")
     .eq("id", state.user.id)
     .single();
 
   if (error) {
-    console.error("Profile loading failed:", error);
+    elements.profileDisplayName.textContent = "Profile error";
+    elements.profileUsername.textContent = error.message;
     return;
   }
 
   state.profile = data;
-  renderProfile();
-}
 
-function renderProfile() {
-  if (!state.profile) {
-    return;
-  }
-
-  elements.profileName.textContent = state.profile.display_name;
-  elements.profileUsername.textContent = `@${state.profile.username}`;
-  elements.profileAvatar.textContent = getInitial(
-    state.profile.display_name
-  );
+  elements.profileDisplayName.textContent = data.display_name;
+  elements.profileUsername.textContent = `@${data.username}`;
+  elements.profileAvatar.textContent = getInitial(data.display_name);
 }
 
 async function loadServers() {
-  const [
-    serversResult,
-    membershipsResult
-  ] = await Promise.all([
-    supabaseClient
-      .from("servers")
-      .select("*")
-      .order("created_at", { ascending: true }),
-    supabaseClient
-      .from("server_members")
-      .select("server_id, role")
-      .eq("user_id", state.user.id)
-  ]);
-
-  if (serversResult.error) {
-    console.error("Server loading failed:", serversResult.error);
-    state.servers = [];
-  } else {
-    state.servers = serversResult.data || [];
-  }
-
-  if (membershipsResult.error) {
-    console.error(
-      "Membership loading failed:",
-      membershipsResult.error
-    );
-    state.memberships = [];
-  } else {
-    state.memberships = membershipsResult.data || [];
-  }
-
-  renderServerRail();
-}
-
-function isServerMember(serverId) {
-  return state.memberships.some(
-    (membership) => membership.server_id === serverId
-  );
-}
-
-function renderServerRail() {
   elements.serverList.replaceChildren();
 
-  const joinedServers = state.servers.filter((server) =>
-    isServerMember(server.id)
-  );
+  const { data, error } = await supabaseClient
+    .from("servers")
+    .select("id, owner_id, name, description, visibility, created_at")
+    .order("created_at", { ascending: true });
 
-  joinedServers.forEach((server) => {
+  if (error) {
+    showMessageState("Server error", error.message);
+    return;
+  }
+
+  state.servers = data || [];
+  renderServers();
+}
+
+function renderServers() {
+  elements.serverList.replaceChildren();
+
+  state.servers.forEach((server) => {
     const button = document.createElement("button");
+
     button.className = "rail-button server-button";
     button.type = "button";
-    button.textContent = createServerShortName(server.name);
+    button.textContent = getServerShortName(server.name);
     button.title = server.name;
-    button.setAttribute("aria-label", `Open ${server.name}`);
 
     if (state.selectedServer?.id === server.id) {
       button.classList.add("active");
     }
 
     button.addEventListener("click", () => {
-      openServer(server.id);
+      selectServer(server.id);
     });
 
     elements.serverList.appendChild(button);
   });
 }
 
-function hideNavigationViews() {
-  elements.homeNavigation.hidden = true;
-  elements.serverNavigation.hidden = true;
-  elements.discoverNavigation.hidden = true;
-}
-
-function renderHome() {
-  hideNavigationViews();
-  elements.homeNavigation.hidden = false;
-
-  elements.navigationTitle.textContent = "ColloTalk";
-  elements.navigationSubtitle.textContent = "Online conversations";
-
-  state.selectedServer = null;
-  state.selectedChannel = null;
-  state.channels = [];
-
-  removeMessageSubscription();
-  renderServerRail();
-
-  elements.composer.hidden = true;
-  elements.chatTitle.textContent = "Welcome to ColloTalk";
-  elements.chatSubtitle.textContent =
-    "Select or create a server to begin";
-
-  elements.chatIcon.innerHTML = `
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
-    </svg>
-  `;
-
-  elements.messageArea.innerHTML = `
-    <div class="welcome-state">
-      <div class="welcome-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
-        </svg>
-      </div>
-      <h3>Talk. Speak. Open your world.</h3>
-      <p>Create a server or discover a public community.</p>
-    </div>
-  `;
-
-  closeNavigation();
-}
-
-async function openServer(serverId) {
+async function selectServer(serverId) {
   const server = state.servers.find((item) => item.id === serverId);
 
-  if (!server || !isServerMember(serverId)) {
+  if (!server) {
     return;
   }
 
+  await unsubscribeFromMessages();
+
   state.selectedServer = server;
+  state.selectedChannel = null;
+  state.channels = [];
+  state.messages = [];
 
-  hideNavigationViews();
+  elements.homeNavigation.hidden = true;
   elements.serverNavigation.hidden = false;
-
   elements.navigationTitle.textContent = server.name;
   elements.navigationSubtitle.textContent = "Community server";
   elements.serverDescription.textContent =
-    server.description || "No description provided.";
+    server.description || "No server description.";
+
+  await loadMembership();
+  renderMembershipControls();
+  await loadChannels();
+  closeNavigation();
+}
+
+async function loadMembership() {
+  const { data, error } = await supabaseClient
+    .from("server_members")
+    .select("server_id, user_id, role")
+    .eq("server_id", state.selectedServer.id)
+    .eq("user_id", state.user.id)
+    .maybeSingle();
+
+  state.membership = error ? null : data;
+}
+
+function renderMembershipControls() {
+  const isMember = Boolean(state.membership);
+
+  elements.joinServerButton.hidden = isMember;
+  elements.createChannelButton.hidden =
+    !state.membership ||
+    !["owner", "admin"].includes(state.membership.role);
+}
+
+async function joinSelectedServer() {
+  if (!state.selectedServer) {
+    return;
+  }
+
+  elements.joinServerButton.disabled = true;
+  elements.joinServerButton.textContent = "Joining...";
+
+  const { error } = await supabaseClient
+    .from("server_members")
+    .insert({
+      server_id: state.selectedServer.id,
+      user_id: state.user.id,
+      role: "member"
+    });
+
+  elements.joinServerButton.disabled = false;
+  elements.joinServerButton.textContent = "Join Server";
+
+  if (error) {
+    window.alert(error.message);
+    return;
+  }
+
+  await loadMembership();
+  renderMembershipControls();
+  await loadChannels();
+}
+
+async function loadChannels() {
+  elements.channelList.replaceChildren();
+
+  if (!state.membership) {
+    const message = document.createElement("p");
+    message.className = "empty-list";
+    message.textContent = "Join this server to view its channels.";
+    elements.channelList.appendChild(message);
+
+    showMessageState(
+      state.selectedServer.name,
+      "Join this community to open its channels and messages."
+    );
+
+    return;
+  }
 
   const { data, error } = await supabaseClient
     .from("channels")
-    .select("*")
-    .eq("server_id", server.id)
+    .select("id, server_id, name, description, position, created_at")
+    .eq("server_id", state.selectedServer.id)
     .order("position", { ascending: true })
     .order("created_at", { ascending: true });
 
   if (error) {
-    console.error("Channel loading failed:", error);
+    showMessageState("Channel error", error.message);
     return;
   }
 
   state.channels = data || [];
   renderChannels();
-  renderServerRail();
 
   if (state.channels.length > 0) {
-    await openChannel(state.channels[0].id);
+    await selectChannel(state.channels[0].id);
+  } else {
+    showMessageState(
+      state.selectedServer.name,
+      "This server does not have any channels yet."
+    );
   }
-
-  closeNavigation();
 }
 
 function renderChannels() {
@@ -437,6 +427,7 @@ function renderChannels() {
 
   state.channels.forEach((channel) => {
     const button = document.createElement("button");
+
     button.className = "channel-button";
     button.type = "button";
 
@@ -454,48 +445,40 @@ function renderChannels() {
     button.append(symbol, name);
 
     button.addEventListener("click", () => {
-      openChannel(channel.id);
+      selectChannel(channel.id);
     });
 
     elements.channelList.appendChild(button);
   });
 }
 
-async function openChannel(channelId) {
-  const channel = state.channels.find(
-    (item) => item.id === channelId
-  );
+async function selectChannel(channelId) {
+  const channel = state.channels.find((item) => item.id === channelId);
 
   if (!channel) {
     return;
   }
 
+  await unsubscribeFromMessages();
+
   state.selectedChannel = channel;
+  state.messages = [];
+
+  renderChannels();
 
   elements.chatIcon.textContent = "#";
   elements.chatTitle.textContent = `# ${channel.name}`;
   elements.chatSubtitle.textContent = state.selectedServer.name;
-  elements.composer.hidden = false;
   elements.messageInput.placeholder = `Message #${channel.name}`;
+  elements.composer.hidden = false;
 
-  renderChannels();
   await loadMessages();
-  subscribeToMessages(channel.id);
+  subscribeToMessages();
 }
 
 async function loadMessages() {
-  if (!state.selectedChannel) {
-    return;
-  }
-
-  elements.messageArea.innerHTML = `
-    <div class="welcome-state">
-      <p>Loading messages...</p>
-    </div>
-  `;
-
   const { data, error } = await supabaseClient
-    .from("server_messages")
+    .from("messages")
     .select(`
       id,
       channel_id,
@@ -514,63 +497,43 @@ async function loadMessages() {
     .limit(200);
 
   if (error) {
-    console.error("Message loading failed:", error);
-
-    elements.messageArea.innerHTML = `
-      <div class="welcome-state">
-        <h3>Messages could not be loaded</h3>
-        <p>${escapeHtml(error.message)}</p>
-      </div>
-    `;
-
+    showMessageState("Message error", error.message);
     return;
   }
 
-  renderMessages(data || []);
+  state.messages = data || [];
+  renderMessages();
 }
 
-function renderMessages(messages) {
+function renderMessages() {
   elements.messageArea.replaceChildren();
 
-  if (messages.length === 0) {
-    elements.messageArea.innerHTML = `
-      <div class="welcome-state">
-        <div class="welcome-icon">#</div>
-        <h3>Welcome to #${escapeHtml(state.selectedChannel.name)}</h3>
-        <p>This is the beginning of the channel.</p>
-      </div>
-    `;
-
+  if (state.messages.length === 0) {
+    showMessageState(
+      `#${state.selectedChannel.name}`,
+      `This is the beginning of #${state.selectedChannel.name}.`
+    );
     return;
   }
 
-  messages.forEach((message) => {
-    elements.messageArea.appendChild(
-      createMessageElement(message)
-    );
+  state.messages.forEach((message) => {
+    elements.messageArea.appendChild(createMessageElement(message));
   });
 
-  scrollMessagesToBottom();
+  scrollToBottom();
 }
 
 function createMessageElement(message) {
+  const profile = message.profiles || {};
+  const displayName = profile.display_name || "Unknown user";
+  const isOwnMessage = message.sender_id === state.user.id;
+
   const article = document.createElement("article");
   article.className = "message";
-
-  const isOwnMessage = message.sender_id === state.user.id;
 
   if (isOwnMessage) {
     article.classList.add("own-message");
   }
-
-  const profile = Array.isArray(message.profiles)
-    ? message.profiles[0]
-    : message.profiles;
-
-  const displayName =
-    profile?.display_name ||
-    profile?.username ||
-    "Unknown User";
 
   const avatar = document.createElement("div");
   avatar.className = isOwnMessage
@@ -579,11 +542,11 @@ function createMessageElement(message) {
 
   avatar.textContent = getInitial(displayName);
 
-  const content = document.createElement("div");
-  content.className = "message-content";
+  const body = document.createElement("div");
+  body.className = "message-body";
 
-  const metadata = document.createElement("div");
-  metadata.className = "message-meta";
+  const meta = document.createElement("div");
+  meta.className = "message-meta";
 
   const author = document.createElement("strong");
   author.textContent = displayName;
@@ -596,11 +559,254 @@ function createMessageElement(message) {
   bubble.className = "message-bubble";
   bubble.textContent = message.content;
 
-  metadata.append(author, time);
-  content.append(metadata, bubble);
-  article.append(avatar, content);
+  meta.append(author, time);
+  body.append(meta, bubble);
+  article.append(avatar, body);
 
   return article;
+}
+
+async function sendMessage(event) {
+  event.preventDefault();
+
+  const content = elements.messageInput.value.trim();
+
+  if (!content || !state.selectedChannel) {
+    return;
+  }
+
+  elements.sendButton.disabled = true;
+  elements.composerStatus.textContent = "Sending...";
+
+  const { error } = await supabaseClient
+    .from("messages")
+    .insert({
+      channel_id: state.selectedChannel.id,
+      sender_id: state.user.id,
+      content: content.slice(0, 2000)
+    });
+
+  if (error) {
+    elements.composerStatus.textContent = error.message;
+    updateComposer();
+    return;
+  }
+
+  elements.messageInput.value = "";
+  elements.composerStatus.textContent = "Connected";
+  updateComposer();
+}
+
+function subscribeToMessages() {
+  if (!state.selectedChannel) {
+    return;
+  }
+
+  const channelId = state.selectedChannel.id;
+
+  state.realtimeChannel = supabaseClient
+    .channel(`messages:${channelId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+        filter: `channel_id=eq.${channelId}`
+      },
+      async () => {
+        if (state.selectedChannel?.id === channelId) {
+          await loadMessages();
+        }
+      }
+    )
+    .subscribe((status) => {
+      elements.composerStatus.textContent =
+        status === "SUBSCRIBED" ? "Connected" : status;
+    });
+}
+
+async function unsubscribeFromMessages() {
+  if (!state.realtimeChannel) {
+    return;
+  }
+
+  await supabaseClient.removeChannel(state.realtimeChannel);
+  state.realtimeChannel = null;
+}
+
+async function createServer(event) {
+  event.preventDefault();
+
+  const name = elements.serverNameInput.value.trim();
+  const description = elements.serverDescriptionInput.value.trim();
+
+  setFormMessage(
+    elements.createServerMessage,
+    "Creating server...",
+    true
+  );
+
+  const { data: server, error: serverError } =
+    await supabaseClient
+      .from("servers")
+      .insert({
+        owner_id: state.user.id,
+        name,
+        description,
+        visibility: "public"
+      })
+      .select("id, owner_id, name, description, visibility, created_at")
+      .single();
+
+  if (serverError) {
+    setFormMessage(
+      elements.createServerMessage,
+      serverError.message
+    );
+    return;
+  }
+
+  const { error: channelError } = await supabaseClient
+    .from("channels")
+    .insert({
+      server_id: server.id,
+      name: "general",
+      description: "General conversation",
+      position: 0
+    });
+
+  if (channelError) {
+    setFormMessage(
+      elements.createServerMessage,
+      channelError.message
+    );
+    return;
+  }
+
+  closeServerModal();
+  await loadServers();
+  await selectServer(server.id);
+}
+
+async function createChannel(event) {
+  event.preventDefault();
+
+  if (!state.selectedServer) {
+    return;
+  }
+
+  const name = elements.channelNameInput.value
+    .trim()
+    .toLowerCase();
+
+  if (!/^[a-z0-9_-]{1,40}$/.test(name)) {
+    setFormMessage(
+      elements.createChannelMessage,
+      "Use lowercase letters, numbers, hyphens, or underscores."
+    );
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("channels")
+    .insert({
+      server_id: state.selectedServer.id,
+      name,
+      description: "",
+      position: state.channels.length
+    })
+    .select("id, server_id, name, description, position, created_at")
+    .single();
+
+  if (error) {
+    setFormMessage(elements.createChannelMessage, error.message);
+    return;
+  }
+
+  closeChannelModal();
+  await loadChannels();
+  await selectChannel(data.id);
+}
+
+function showMessageState(title, description) {
+  elements.messageArea.replaceChildren();
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "empty-state";
+
+  const icon = document.createElement("div");
+  icon.className = "empty-state-icon";
+  icon.textContent = getInitial(title);
+
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+
+  const paragraph = document.createElement("p");
+  paragraph.textContent = description;
+
+  wrapper.append(icon, heading, paragraph);
+  elements.messageArea.appendChild(wrapper);
+}
+
+function renderHomeState() {
+  state.selectedServer = null;
+  state.selectedChannel = null;
+  state.channels = [];
+  state.messages = [];
+  state.membership = null;
+
+  elements.homeNavigation.hidden = false;
+  elements.serverNavigation.hidden = true;
+  elements.navigationTitle.textContent = "ColloTalk";
+  elements.navigationSubtitle.textContent = "Online conversations";
+  elements.composer.hidden = true;
+
+  elements.chatIcon.innerHTML = `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+    </svg>
+  `;
+
+  elements.chatTitle.textContent = "Welcome to ColloTalk";
+  elements.chatSubtitle.textContent =
+    "Select or create a community server";
+
+  showMessageState(
+    "ColloTalk is online",
+    "Create a server or select an existing community from the server rail."
+  );
+
+  renderServers();
+}
+
+function updateComposer() {
+  const value = elements.messageInput.value;
+
+  elements.characterCount.textContent = `${value.length} / 2000`;
+  elements.sendButton.disabled = value.trim().length === 0;
+
+  elements.messageInput.style.height = "auto";
+  elements.messageInput.style.height =
+    `${Math.min(elements.messageInput.scrollHeight, 150)}px`;
+}
+
+function getInitial(value) {
+  const text = String(value || "").trim();
+  return text ? Array.from(text)[0].toUpperCase() : "?";
+}
+
+function getServerShortName(name) {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+
+  if (words.length >= 2) {
+    return `${getInitial(words[0])}${getInitial(words[1])}`;
+  }
+
+  return Array.from(name.trim())
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 }
 
 function formatTime(value) {
@@ -616,306 +822,36 @@ function formatTime(value) {
   }).format(date);
 }
 
-async function sendMessage() {
-  const content = elements.messageInput.value.trim();
-
-  if (!content || !state.selectedChannel) {
-    return;
-  }
-
-  elements.sendButton.disabled = true;
-
-  const { error } = await supabaseClient
-    .from("server_messages")
-    .insert({
-      channel_id: state.selectedChannel.id,
-      sender_id: state.user.id,
-      content: content.slice(0, 2000)
-    });
-
-  if (error) {
-    console.error("Message sending failed:", error);
-    window.alert(`Message could not be sent: ${error.message}`);
-    elements.sendButton.disabled = false;
-    return;
-  }
-
-  elements.messageInput.value = "";
-  updateComposer();
-}
-
-function subscribeToMessages(channelId) {
-  removeMessageSubscription();
-
-  state.messageSubscription = supabaseClient
-    .channel(`channel-messages-${channelId}`)
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "server_messages",
-        filter: `channel_id=eq.${channelId}`
-      },
-      () => {
-        loadMessages();
-      }
-    )
-    .subscribe();
-}
-
-function removeMessageSubscription() {
-  if (!state.messageSubscription) {
-    return;
-  }
-
-  supabaseClient.removeChannel(state.messageSubscription);
-  state.messageSubscription = null;
-}
-
-async function showDiscoverServers() {
-  hideNavigationViews();
-  elements.discoverNavigation.hidden = false;
-
-  elements.navigationTitle.textContent = "Discover";
-  elements.navigationSubtitle.textContent = "Public communities";
-  elements.discoverList.innerHTML =
-    '<p class="empty-navigation-text">Loading servers...</p>';
-
-  await loadServers();
-
-  const publicServers = state.servers.filter(
-    (server) => server.visibility === "public"
-  );
-
-  elements.discoverList.replaceChildren();
-
-  if (publicServers.length === 0) {
-    elements.discoverList.appendChild(
-      createTextElement(
-        "p",
-        "empty-navigation-text",
-        "No public servers are available yet."
-      )
-    );
-    return;
-  }
-
-  publicServers.forEach((server) => {
-    const card = document.createElement("article");
-    card.className = "discover-card";
-
-    const title = document.createElement("h3");
-    title.textContent = server.name;
-
-    const description = document.createElement("p");
-    description.textContent =
-      server.description || "No description provided.";
-
-    const button = document.createElement("button");
-    button.type = "button";
-
-    const joined = isServerMember(server.id);
-    button.textContent = joined ? "Open Server" : "Join Server";
-
-    button.addEventListener("click", async () => {
-      if (joined) {
-        await openServer(server.id);
-      } else {
-        await joinServer(server.id);
-      }
-    });
-
-    card.append(title, description, button);
-    elements.discoverList.appendChild(card);
+function scrollToBottom() {
+  requestAnimationFrame(() => {
+    elements.messageArea.scrollTop =
+      elements.messageArea.scrollHeight;
   });
-
-  closeNavigation();
 }
 
-async function joinServer(serverId) {
-  const { error } = await supabaseClient
-    .from("server_members")
-    .insert({
-      server_id: serverId,
-      user_id: state.user.id,
-      role: "member"
-    });
-
-  if (error) {
-    window.alert(`Server could not be joined: ${error.message}`);
-    return;
-  }
-
-  await loadServers();
-  await openServer(serverId);
-}
-
-function openCreateServerModal() {
+function openServerModal() {
   elements.serverNameInput.value = "";
   elements.serverDescriptionInput.value = "";
-  elements.publicServerInput.checked = true;
-  setFormMessage(elements.createServerMessage, "");
-
+  elements.createServerMessage.textContent = "";
   elements.createServerModal.showModal();
-
-  requestAnimationFrame(() => {
-    elements.serverNameInput.focus();
-  });
 }
 
-function closeCreateServerModal() {
+function closeServerModal() {
   if (elements.createServerModal.open) {
     elements.createServerModal.close();
   }
 }
 
-async function createServer(event) {
-  event.preventDefault();
+function openChannelModal() {
+  elements.channelNameInput.value = "";
+  elements.createChannelMessage.textContent = "";
+  elements.createChannelModal.showModal();
+}
 
-  const name = elements.serverNameInput.value.trim();
-  const description =
-    elements.serverDescriptionInput.value.trim();
-
-  setFormMessage(
-    elements.createServerMessage,
-    "Creating server..."
-  );
-
-  const { data, error } = await supabaseClient
-    .from("servers")
-    .insert({
-      owner_id: state.user.id,
-      name,
-      description,
-      visibility: elements.publicServerInput.checked
-        ? "public"
-        : "private"
-    })
-    .select()
-    .single();
-
-  if (error) {
-    setFormMessage(
-      elements.createServerMessage,
-      error.message,
-      "error"
-    );
-    return;
+function closeChannelModal() {
+  if (elements.createChannelModal.open) {
+    elements.createChannelModal.close();
   }
-
-  setFormMessage(
-    elements.createServerMessage,
-    "Server created.",
-    "success"
-  );
-
-  closeCreateServerModal();
-  await loadServers();
-  await openServer(data.id);
-}
-
-function openProfileModal() {
-  if (!state.profile) {
-    return;
-  }
-
-  elements.profileDisplayNameInput.value =
-    state.profile.display_name;
-
-  elements.profileBioInput.value = state.profile.bio || "";
-  setFormMessage(elements.profileMessage, "");
-
-  elements.profileModal.showModal();
-}
-
-function closeProfileModal() {
-  if (elements.profileModal.open) {
-    elements.profileModal.close();
-  }
-}
-
-async function saveProfile(event) {
-  event.preventDefault();
-
-  const displayName =
-    elements.profileDisplayNameInput.value.trim();
-
-  const bio = elements.profileBioInput.value.trim();
-
-  setFormMessage(elements.profileMessage, "Saving profile...");
-
-  const { data, error } = await supabaseClient
-    .from("profiles")
-    .update({
-      display_name: displayName,
-      bio
-    })
-    .eq("id", state.user.id)
-    .select()
-    .single();
-
-  if (error) {
-    setFormMessage(
-      elements.profileMessage,
-      error.message,
-      "error"
-    );
-    return;
-  }
-
-  state.profile = data;
-  renderProfile();
-
-  setFormMessage(
-    elements.profileMessage,
-    "Profile saved.",
-    "success"
-  );
-
-  closeProfileModal();
-}
-
-async function signOut() {
-  removeMessageSubscription();
-
-  const { error } = await supabaseClient.auth.signOut();
-
-  if (error) {
-    window.alert(`Sign out failed: ${error.message}`);
-    return;
-  }
-
-  state.session = null;
-  state.user = null;
-  state.profile = null;
-  state.servers = [];
-  state.memberships = [];
-  state.channels = [];
-  state.selectedServer = null;
-  state.selectedChannel = null;
-
-  showScreen("landing");
-}
-
-function updateComposer() {
-  const value = elements.messageInput.value;
-
-  elements.characterCount.textContent =
-    `${value.length} / 2000`;
-
-  elements.sendButton.disabled = value.trim().length === 0;
-
-  elements.messageInput.style.height = "auto";
-  elements.messageInput.style.height =
-    `${Math.min(elements.messageInput.scrollHeight, 150)}px`;
-}
-
-function scrollMessagesToBottom() {
-  requestAnimationFrame(() => {
-    elements.messageArea.scrollTop =
-      elements.messageArea.scrollHeight;
-  });
 }
 
 function openNavigation() {
@@ -928,163 +864,95 @@ function closeNavigation() {
   elements.mobileOverlay.classList.remove("visible");
 }
 
-function createTextElement(tag, className, text) {
-  const element = document.createElement(tag);
-  element.className = className;
-  element.textContent = text;
-  return element;
-}
-
-function escapeHtml(value) {
-  const element = document.createElement("div");
-  element.textContent = String(value || "");
-  return element.innerHTML;
-}
-
-function setUpEventListeners() {
+function setupEvents() {
   elements.getStartedButton.addEventListener("click", () => {
-    setAuthMode("signup");
-    showScreen("auth");
+    showAuth("signup");
   });
 
-  elements.signInButton.addEventListener("click", () => {
-    setAuthMode("signin");
-    showScreen("auth");
+  elements.signInLandingButton.addEventListener("click", () => {
+    showAuth("signin");
   });
 
   elements.authBackButton.addEventListener("click", () => {
-    showScreen("landing");
+    showOnly(elements.landingScreen);
   });
 
-  elements.authSwitchButton.addEventListener("click", () => {
-    setAuthMode(
-      state.authMode === "signup" ? "signin" : "signup"
-    );
+  elements.signInTab.addEventListener("click", () => {
+    setAuthMode("signin");
   });
 
-  elements.authForm.addEventListener(
-    "submit",
-    handleAuthentication
-  );
+  elements.signUpTab.addEventListener("click", () => {
+    setAuthMode("signup");
+  });
 
-  elements.homeButton.addEventListener("click", renderHome);
+  elements.signInForm.addEventListener("submit", signIn);
+  elements.signUpForm.addEventListener("submit", signUp);
 
-  elements.discoverServersButton.addEventListener(
-    "click",
-    showDiscoverServers
-  );
-
-  elements.addServerButton.addEventListener(
-    "click",
-    openCreateServerModal
-  );
-
-  elements.createServerForm.addEventListener(
-    "submit",
-    createServer
-  );
-
-  elements.closeCreateServerButton.addEventListener(
-    "click",
-    closeCreateServerModal
-  );
-
-  elements.cancelCreateServerButton.addEventListener(
-    "click",
-    closeCreateServerModal
-  );
-
-  elements.profileButton.addEventListener(
-    "click",
-    openProfileModal
-  );
-
-  elements.profileForm.addEventListener(
-    "submit",
-    saveProfile
-  );
-
-  elements.closeProfileButton.addEventListener(
-    "click",
-    closeProfileModal
-  );
-
-  elements.cancelProfileButton.addEventListener(
-    "click",
-    closeProfileModal
-  );
+  elements.returnToSignInButton.addEventListener("click", () => {
+    showAuth("signin");
+  });
 
   elements.signOutButton.addEventListener("click", signOut);
+  elements.homeButton.addEventListener("click", renderHomeState);
+  elements.refreshServersButton.addEventListener("click", loadServers);
+  elements.createServerButton.addEventListener("click", openServerModal);
+  elements.createServerForm.addEventListener("submit", createServer);
+  elements.closeServerModalButton.addEventListener("click", closeServerModal);
+  elements.cancelServerButton.addEventListener("click", closeServerModal);
+  elements.joinServerButton.addEventListener("click", joinSelectedServer);
+  elements.createChannelButton.addEventListener("click", openChannelModal);
+  elements.createChannelForm.addEventListener("submit", createChannel);
+  elements.cancelChannelButton.addEventListener("click", closeChannelModal);
+  elements.messageForm.addEventListener("submit", sendMessage);
+  elements.messageInput.addEventListener("input", updateComposer);
 
-  elements.messageForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    sendMessage();
+  elements.messageInput.addEventListener("keydown", (event) => {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey &&
+      !event.isComposing
+    ) {
+      event.preventDefault();
+      elements.messageForm.requestSubmit();
+    }
   });
 
-  elements.messageInput.addEventListener(
-    "input",
-    updateComposer
-  );
-
-  elements.messageInput.addEventListener(
-    "keydown",
-    (event) => {
-      if (
-        event.key === "Enter" &&
-        !event.shiftKey &&
-        !event.isComposing
-      ) {
-        event.preventDefault();
-        sendMessage();
-      }
-    }
-  );
-
-  elements.menuButton.addEventListener(
-    "click",
-    openNavigation
-  );
-
-  elements.closeNavigationButton.addEventListener(
-    "click",
-    closeNavigation
-  );
-
-  elements.mobileOverlay.addEventListener(
-    "click",
-    closeNavigation
-  );
+  elements.menuButton.addEventListener("click", openNavigation);
+  elements.closeNavigationButton.addEventListener("click", closeNavigation);
+  elements.mobileOverlay.addEventListener("click", closeNavigation);
 }
 
-async function initializeApplication() {
-  setUpEventListeners();
+async function initialize() {
+  setupEvents();
   updateComposer();
+  await testConnection();
 
   const {
     data: { session }
   } = await supabaseClient.auth.getSession();
 
   if (session) {
-    await startAuthenticatedApplication(session);
+    await enterApplication(session);
   } else {
-    showScreen("landing");
+    showOnly(elements.landingScreen);
   }
 
-  supabaseClient.auth.onAuthStateChange(
-    async (event, currentSession) => {
-      if (
-        event === "SIGNED_IN" &&
-        currentSession &&
-        currentSession.user.id !== state.user?.id
-      ) {
-        await startAuthenticatedApplication(currentSession);
-      }
-
-      if (event === "SIGNED_OUT") {
-        showScreen("landing");
-      }
+  supabaseClient.auth.onAuthStateChange((event, sessionValue) => {
+    if (event === "SIGNED_OUT") {
+      showOnly(elements.landingScreen);
+      return;
     }
-  );
+
+    if (
+      event === "SIGNED_IN" &&
+      sessionValue &&
+      !state.session
+    ) {
+      window.setTimeout(() => {
+        enterApplication(sessionValue);
+      }, 0);
+    }
+  });
 }
 
-initializeApplication();
+initialize();
