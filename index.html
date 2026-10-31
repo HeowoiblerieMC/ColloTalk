@@ -8,11 +8,11 @@
   >
   <meta
     name="description"
-    content="ColloTalk is an online platform for conversations and communities."
+    content="ColloTalk is an online platform for direct conversations, private groups, and open communities."
   >
   <meta name="theme-color" content="#080a10">
   <title>ColloTalk</title>
-  <link rel="stylesheet" href="./style.css?v=8">
+  <link rel="stylesheet" href="./style.css?v=15">
 </head>
 <body>
   <main class="landing-screen" id="landingScreen">
@@ -20,31 +20,40 @@
     <div class="background-glow background-glow-two"></div>
 
     <section class="landing-content">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
-        </svg>
-      </div>
-
-      <p class="eyebrow">COLLOTALK</p>
-
-      <h1>
-        Talk. Speak.
-        <span>Open your world.</span>
-      </h1>
+      <img
+        class="collotalk-brand-image"
+        src="./IMG_2845.png"
+        alt="ColloTalk"
+      >
 
       <p class="landing-description">
-        Join open communities and start real-time conversations from any
-        supported device.
+        Direct conversations, private groups, and open communities in one
+        simple place.
       </p>
 
       <div class="landing-actions">
-        <button class="primary-button large-button" id="getStartedButton" type="button">
+        <button
+          class="primary-button large-button"
+          id="getStartedButton"
+          type="button"
+        >
           Get Started
         </button>
 
-        <button class="secondary-button large-button" id="signInLandingButton" type="button">
+        <button
+          class="secondary-button large-button"
+          id="signInLandingButton"
+          type="button"
+        >
           Sign In
+        </button>
+
+        <button
+          class="text-button"
+          id="landingPlansButton"
+          type="button"
+        >
+          View Collo Plans
         </button>
       </div>
 
@@ -58,22 +67,17 @@
     <div class="auth-panel">
       <button class="back-button" id="authBackButton" type="button">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M19 12H5M11 6l-6 6 6 6"/>
+          <path d="M19 12H5M11 6l-6 6 6 6"></path>
         </svg>
         Back
       </button>
 
       <div class="auth-brand">
-        <div class="brand-icon brand-icon-small">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
-          </svg>
-        </div>
-
-        <div>
-          <h1>ColloTalk</h1>
-          <p>Talk. Speak. Open your world.</p>
-        </div>
+        <img
+          class="collotalk-brand-image"
+          src="./IMG_2845.png"
+          alt="ColloTalk"
+        >
       </div>
 
       <div class="auth-tabs">
@@ -178,7 +182,7 @@
     <div class="confirmation-card">
       <div class="confirmation-icon">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          7 9-7"/>
+          <path d="M3 6h18v12H3V6Zm0 1 9 7 9-7"></path>
         </svg>
       </div>
 
@@ -194,7 +198,11 @@
         Open the link in the email, then return to ColloTalk and sign in.
       </p>
 
-      <button class="primary-button large-button" id="returnToSignInButton" type="button">
+      <button
+        class="primary-button large-button"
+        id="returnToSignInButton"
+        type="button"
+      >
         Return to Sign In
       </button>
     </div>
@@ -210,7 +218,7 @@
         title="Home"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+          <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"></path>
         </svg>
       </button>
 
@@ -226,7 +234,7 @@
         title="Create Server"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 5v14M5 12h14"/>
+          <path d="M12 5v14M5 12h14"></path>
         </svg>
       </button>
     </aside>
@@ -245,7 +253,7 @@
           aria-label="Close navigation"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m6 6 12 12M18 6 6 18"/>
+            <path d="m6 6 12 12M18 6 6 18"></path>
           </svg>
         </button>
       </header>
@@ -255,7 +263,7 @@
           <nav class="main-navigation">
             <button class="navigation-button active" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
+                <path d="M16 20v-1.5A3.5 3.5 0 0 0 12.5 15h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
               </svg>
               Friends
               <span class="coming-soon-label">Soon</span>
@@ -263,7 +271,7 @@
 
             <button class="navigation-button" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M5 5h14v10H9l-4 4V5Z"/>
+                <path d="M5 5h14v10H9l-4 4V5Z"></path>
               </svg>
               Direct Messages
               <span class="coming-soon-label">Soon</span>
@@ -271,17 +279,33 @@
 
             <button class="navigation-button" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 19v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2M9 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM17 10a2.5 2.5 0 1 0 0-5"/>
+                <path d="M4 19v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2M9 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM17 10a2.5 2.5 0 1 0 0-5"></path>
               </svg>
               Private Groups
               <span class="coming-soon-label">Soon</span>
+            </button>
+
+            <button
+              class="navigation-button"
+              id="plansNavigationButton"
+              type="button"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m12 3 2.4 4.8L20 8.6l-4 3.9.9 5.5-4.9-2.6L7.1 18l.9-5.5-4-3.9 5.6-.8L12 3Z"></path>
+              </svg>
+              Collo Plans
             </button>
           </nav>
 
           <section class="discover-section">
             <div class="section-heading">
               <span>Community Servers</span>
-              <button class="refresh-button" id="refreshServersButton" type="button">
+
+              <button
+                class="refresh-button"
+                id="refreshServersButton"
+                type="button"
+              >
                 Refresh
               </button>
             </div>
@@ -317,7 +341,7 @@
               hidden
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 5v14M5 12h14"/>
+                <path d="M12 5v14M5 12h14"></path>
               </svg>
             </button>
           </div>
@@ -327,11 +351,31 @@
       </div>
 
       <footer class="profile-bar">
-        <div class="avatar avatar-blue" id="profileAvatar">?</div>
+        <button
+          class="profile-avatar-button"
+          id="profileButton"
+          type="button"
+          aria-label="Open profile"
+        >
+          <div class="avatar avatar-blue" id="profileAvatar">?</div>
+          <span class="profile-status-dot"></span>
+        </button>
 
-        <button class="profile-information" type="button">
+        <button
+          class="profile-information"
+          id="profileInformationButton"
+          type="button"
+        >
           <strong id="profileDisplayName">Loading...</strong>
           <span id="profileUsername">@username</span>
+        </button>
+
+        <button
+          class="profile-plan-button"
+          id="profilePlanButton"
+          type="button"
+        >
+          FREE
         </button>
 
         <button
@@ -342,7 +386,7 @@
           title="Sign Out"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9"/>
+            <path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9"></path>
           </svg>
         </button>
       </footer>
@@ -358,13 +402,13 @@
             aria-label="Open navigation"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 7h16M4 12h16M4 17h16"/>
+              <path d="M4 7h16M4 12h16M4 17h16"></path>
             </svg>
           </button>
 
           <div class="chat-icon" id="chatIcon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"/>
+              <path d="M7.5 5h9A4.5 4.5 0 0 1 21 9.5v3A4.5 4.5 0 0 1 16.5 17H12l-4.8 3.2A.75.75 0 0 1 6 19.58V17A4.5 4.5 0 0 1 3 12.76V9.5A4.5 4.5 0 0 1 7.5 5Z"></path>
             </svg>
           </div>
 
@@ -375,18 +419,32 @@
         </div>
       </header>
 
-      <section class="message-area" id="messageArea" aria-live="polite">
+      <section
+        class="message-area"
+        id="messageArea"
+        aria-live="polite"
+      >
         <div class="empty-state">
           <div class="empty-state-icon">C</div>
           <h3>ColloTalk is online</h3>
           <p>
-            Create a server or select an existing community from the server rail.
+            Create a server or select an existing community from the
+            server rail.
           </p>
         </div>
       </section>
 
       <footer class="composer" id="composer" hidden>
         <form class="message-form" id="messageForm">
+          <button
+            class="ai-button"
+            id="aiReplyButton"
+            type="button"
+            title="Collo Pro AI Reply"
+          >
+            AI
+          </button>
+
           <textarea
             id="messageInput"
             rows="1"
@@ -395,9 +453,15 @@
             aria-label="Message"
           ></textarea>
 
-          <button class="send-button" id="sendButton" type="submit" disabled>
+          <button
+            class="send-button"
+            id="sendButton"
+            type="submit"
+            aria-label="Send message"
+            disabled
+          >
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m4 4 17 8-17 8 3-8-3-8Zm3 8h14"/>
+              <path d="m4 4 17 8-17 8 3-8-3-8Zm3 8h14"></path>
             </svg>
           </button>
         </form>
@@ -412,6 +476,277 @@
 
   <div class="mobile-overlay" id="mobileOverlay"></div>
 
+  <aside class="profile-panel" id="profilePanel" hidden>
+    <div class="profile-cover" id="profileCover">
+      <button
+        class="profile-close-button"
+        id="closeProfilePanelButton"
+        type="button"
+        aria-label="Close profile"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="profile-panel-content">
+      <div class="profile-large-avatar-wrapper">
+        <div class="profile-large-avatar" id="profilePanelAvatar">?</div>
+        <span class="profile-large-status"></span>
+      </div>
+
+      <div class="profile-title-row">
+        <div>
+          <h2 id="profilePanelDisplayName">User</h2>
+          <p id="profilePanelUsername">@username</p>
+        </div>
+
+        <div class="profile-badge-list" id="profileBadgeList"></div>
+      </div>
+
+      <p class="profile-bio" id="profilePanelBio">
+        No bio has been added yet.
+      </p>
+
+      <div class="profile-action-grid">
+        <button
+          class="profile-action primary-profile-action"
+          id="editProfileButton"
+          type="button"
+        >
+          Edit Profile
+        </button>
+
+        <button
+          class="profile-action"
+          id="messageProfileButton"
+          type="button"
+        >
+          Message
+        </button>
+
+        <button
+          class="profile-action"
+          id="callProfileButton"
+          type="button"
+        >
+          Call
+        </button>
+      </div>
+
+      <section class="profile-card-section">
+        <div class="profile-section-heading">
+          <h3>Cosmetics</h3>
+          <button id="openCosmeticsButton" type="button">View</button>
+        </div>
+
+        <p id="profileCosmeticsText">
+          Standard profile theme
+        </p>
+      </section>
+
+      <section class="profile-card-section">
+        <div class="profile-section-heading">
+          <h3>Mutual Friends</h3>
+        </div>
+
+        <p>No mutual friends</p>
+      </section>
+
+      <section class="profile-card-section">
+        <button
+          class="profile-menu-button"
+          id="copyUserIdButton"
+          type="button"
+        >
+          Copy User ID
+          <span>›</span>
+        </button>
+      </section>
+    </div>
+  </aside>
+
+  <dialog class="modal plans-modal" id="plansModal">
+    <div class="plans-content">
+      <header class="plans-header">
+        <div>
+          <p class="eyebrow">COLLO MEMBERSHIP</p>
+          <h2>Choose how you connect.</h2>
+          <p>
+            Upgrade your profile, unlock premium cosmetics, and access
+            advanced community tools.
+          </p>
+        </div>
+
+        <button
+          class="icon-button"
+          id="closePlansButton"
+          type="button"
+          aria-label="Close plans"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18"></path>
+          </svg>
+        </button>
+      </header>
+
+      <div class="plan-controls">
+        <div class="plan-switch">
+          <button
+            class="plan-switch-button active"
+            id="individualPlanButton"
+            type="button"
+          >
+            Individual
+          </button>
+
+          <button
+            class="plan-switch-button"
+            id="familyPlanButton"
+            type="button"
+          >
+            Family
+          </button>
+        </div>
+
+        <div class="plan-switch">
+          <button
+            class="plan-switch-button active"
+            id="monthlyBillingButton"
+            type="button"
+          >
+            Monthly
+          </button>
+
+          <button
+            class="plan-switch-button"
+            id="yearlyBillingButton"
+            type="button"
+          >
+            Yearly
+          </button>
+        </div>
+      </div>
+
+      <p class="family-note" id="familyNote" hidden>
+        Family plans support up to four independent accounts for
+        approximately the price of three individual subscriptions.
+      </p>
+
+      <div class="plan-grid">
+        <article class="plan-card free-plan-card">
+          <span class="plan-label">FREE</span>
+          <h3>Collo Free</h3>
+          <p class="plan-summary">
+            Everything needed to start talking.
+          </p>
+
+          <div class="plan-price">
+            <strong>$0</strong>
+            <span>forever</span>
+          </div>
+
+          <ul>
+            <li>Direct messages</li>
+            <li>Private groups with up to 15 people</li>
+            <li>Community servers</li>
+            <li>Standard profiles</li>
+            <li>Free and purchased cosmetics</li>
+          </ul>
+
+          <button class="plan-card-button current-plan" type="button">
+            Current Plan
+          </button>
+        </article>
+
+        <article class="plan-card plus-plan-card">
+          <span class="plan-label">PLUS</span>
+          <h3>Collo Plus</h3>
+          <p class="plan-summary">
+            More ways to express yourself.
+          </p>
+
+          <div class="plan-price">
+            <strong id="plusPrice">$3.99</strong>
+            <span id="plusPricePeriod">per month</span>
+          </div>
+
+          <ul>
+            <li>Everything in Collo Free</li>
+            <li>Plus cosmetics included</li>
+            <li>Plus profile backgrounds included</li>
+            <li>Custom themes and profile effects</li>
+            <li>Larger uploads</li>
+            <li>Advanced message search</li>
+          </ul>
+
+          <button
+            class="plan-card-button plus-plan-button"
+            id="previewPlusButton"
+            type="button"
+          >
+            Preview Plus
+          </button>
+        </article>
+
+        <article class="plan-card pro-plan-card">
+          <span class="recommended-label">MOST POWERFUL</span>
+          <span class="plan-label">PRO</span>
+          <h3>Collo Pro</h3>
+          <p class="plan-summary">
+            The complete ColloTalk experience.
+          </p>
+
+          <div class="plan-price">
+            <strong id="proPrice">$9.99</strong>
+            <span id="proPricePeriod">per month</span>
+          </div>
+
+          <ul>
+            <li>Everything in Collo Plus</li>
+            <li>Plus and Pro cosmetics included</li>
+            <li>AI reply suggestions</li>
+            <li>AI rewriting, summaries, and translation</li>
+            <li>Advanced server management</li>
+            <li>Server analytics and promotion tools</li>
+          </ul>
+
+          <button
+            class="plan-card-button pro-plan-button"
+            id="previewProButton"
+            type="button"
+          >
+            Preview Pro
+          </button>
+        </article>
+      </div>
+
+      <section class="gift-card">
+        <div>
+          <p class="eyebrow">COLLO GIFTS</p>
+          <h3>Give someone more ways to connect.</h3>
+          <p>
+            Collo Plus and Collo Pro can be gifted for selected
+            durations without automatic renewal.
+          </p>
+        </div>
+
+        <button
+          class="secondary-button"
+          id="previewGiftButton"
+          type="button"
+        >
+          Preview Gifting
+        </button>
+      </section>
+
+      <p class="prototype-notice">
+        Payments and subscriptions are not active in this prototype.
+      </p>
+    </div>
+  </dialog>
+
   <dialog class="modal" id="createServerModal">
     <form class="modal-card" id="createServerForm">
       <header class="modal-header">
@@ -421,10 +756,15 @@
           <p>Create an online server with a public general channel.</p>
         </div>
 
-        <button class="icon-button" id="closeServerModalButton" type="button">
+        <button
+          class="icon-button"
+          id="closeServerModalButton"
+          type="button"
+          aria-label="Close"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-  <path d="M3 6h18v12H3V6Zm0 1 9 7 9-7"/>
-</svg>
+            <path d="m6 6 12 12M18 6 6 18"></path>
+          </svg>
         </button>
       </header>
 
@@ -446,10 +786,18 @@
         placeholder="Describe your community"
       ></textarea>
 
-      <p class="form-message" id="createServerMessage" role="alert"></p>
+      <p
+        class="form-message"
+        id="createServerMessage"
+        role="alert"
+      ></p>
 
       <div class="modal-actions">
-        <button class="secondary-button" id="cancelServerButton" type="button">
+        <button
+          class="secondary-button"
+          id="cancelServerButton"
+          type="button"
+        >
           Cancel
         </button>
 
@@ -466,8 +814,22 @@
         <div>
           <p class="eyebrow">NEW CHANNEL</p>
           <h2>Create a Channel</h2>
-          <p>Channel names use lowercase letters, numbers, hyphens, and underscores.</p>
+          <p>
+            Channel names use lowercase letters, numbers, hyphens,
+            and underscores.
+          </p>
         </div>
+
+        <button
+          class="icon-button"
+          id="closeChannelModalButton"
+          type="button"
+          aria-label="Close"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18"></path>
+          </svg>
+        </button>
       </header>
 
       <label for="channelNameInput">Channel Name</label>
@@ -481,10 +843,18 @@
         required
       >
 
-      <p class="form-message" id="createChannelMessage" role="alert"></p>
+      <p
+        class="form-message"
+        id="createChannelMessage"
+        role="alert"
+      ></p>
 
       <div class="modal-actions">
-        <button class="secondary-button" id="cancelChannelButton" type="button">
+        <button
+          class="secondary-button"
+          id="cancelChannelButton"
+          type="button"
+        >
           Cancel
         </button>
 
@@ -495,7 +865,104 @@
     </form>
   </dialog>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./app.js?v=8"></script>
+  <dialog class="modal" id="profileEditModal">
+    <form class="modal-card" id="profileEditForm">
+      <header class="modal-header">
+        <div>
+          <p class="eyebrow">PROFILE</p>
+          <h2>Edit Profile</h2>
+          <p>Update the public information shown on your profile.</p>
+        </div>
+
+        <button
+          class="icon-button"
+          id="closeProfileEditButton"
+          type="button"
+          aria-label="Close"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18"></path>
+          </svg>
+        </button>
+      </header>
+
+      <label for="profileDisplayNameInput">Display Name</label>
+      <input
+        id="profileDisplayNameInput"
+        type="text"
+        minlength="1"
+        maxlength="40"
+        required
+      >
+
+      <label for="profileBioInput">Bio</label>
+      <textarea
+        id="profileBioInput"
+        rows="4"
+        maxlength="300"
+        placeholder="Tell people about yourself"
+      ></textarea>
+
+      <label for="profileAvatarUrlInput">Profile Image URL</label>
+      <input
+        id="profileAvatarUrlInput"
+        type="url"
+        maxlength="1000"
+        placeholder="https://example.com/avatar.png"
+      >
+
+      <label for="profileBackgroundUrlInput">
+        Profile Background URL
+      </label>
+      <input
+        id="profileBackgroundUrlInput"
+        type="url"
+        maxlength="1000"
+        placeholder="https://example.com/background.png"
+      >
+
+      <p
+        class="form-message"
+        id="profileEditMessage"
+        role="alert"
+      ></p>
+
+      <div class="modal-actions">
+        <button
+          class="secondary-button"
+          id="cancelProfileEditButton"
+          type="button"
+        >
+          Cancel
+        </button>
+
+        <button class="primary-button" type="submit">
+          Save Profile
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="previewModal">
+    <div class="modal-card preview-card">
+      <div class="preview-icon" id="previewIcon">C</div>
+      <p class="eyebrow">COMING LATER</p>
+      <h2 id="previewTitle">Feature Preview</h2>
+      <p id="previewDescription">
+        This feature is not active in the current prototype.
+      </p>
+
+      <button
+        class="primary-button full-width-button"
+        id="closePreviewButton"
+        type="button"
+      >
+        Got It
+      </button>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./app.js?v=15"></script>
 </body>
 </html>
