@@ -8,6 +8,57 @@ const SUPABASE_PUBLISHABLE_KEY =
 
 const OWNER_USER_ID = "";
 
+const BADGE_IMAGES = {
+  owner: "./img/owner.jpg",
+  pro: "./img/pro.jpg",
+  plus: "./img/plus.jpg",
+  admin: "./img/admin.jpg",
+  moderator: "./img/mod.jpg",
+  support: "./img/support.jpg",
+  developer: "./img/dev.jpg",
+  gifter: "./img/gifter.jpg",
+  bugHunter: "./img/bughunt.jpg"
+};
+
+const BADGE_INFORMATION = {
+  owner: {
+    label: "Owner",
+    description: "Official owner of ColloTalk."
+  },
+  pro: {
+    label: "Collo Pro",
+    description: "Active Collo Pro member."
+  },
+  plus: {
+    label: "Collo Plus",
+    description: "Active Collo Plus member."
+  },
+  admin: {
+    label: "Admin",
+    description: "ColloTalk administrator."
+  },
+  moderator: {
+    label: "Moderator",
+    description: "ColloTalk moderation team member."
+  },
+  support: {
+    label: "Support",
+    description: "ColloTalk support team member."
+  },
+  developer: {
+    label: "Developer",
+    description: "ColloTalk developer."
+  },
+  gifter: {
+    label: "Gifter",
+    description: "Recognized for gifting Collo memberships."
+  },
+  bugHunter: {
+    label: "Bug Hunter",
+    description: "Recognized for reporting important ColloTalk bugs."
+  }
+};
+
 const PLAN_PRICES = {
   individual: {
     monthly: {
@@ -70,23 +121,13 @@ const state = {
 const elements = {
   landingScreen: document.getElementById("landingScreen"),
   authScreen: document.getElementById("authScreen"),
-  confirmationScreen: document.getElementById(
-    "confirmationScreen"
-  ),
+  confirmationScreen: document.getElementById("confirmationScreen"),
   appShell: document.getElementById("appShell"),
-  connectionStatus: document.getElementById(
-    "connectionStatus"
-  ),
+  connectionStatus: document.getElementById("connectionStatus"),
 
-  getStartedButton: document.getElementById(
-    "getStartedButton"
-  ),
-  signInLandingButton: document.getElementById(
-    "signInLandingButton"
-  ),
-  landingPlansButton: document.getElementById(
-    "landingPlansButton"
-  ),
+  getStartedButton: document.getElementById("getStartedButton"),
+  signInLandingButton: document.getElementById("signInLandingButton"),
+  landingPlansButton: document.getElementById("landingPlansButton"),
 
   authBackButton: document.getElementById("authBackButton"),
   signInTab: document.getElementById("signInTab"),
@@ -97,47 +138,31 @@ const elements = {
   signInPassword: document.getElementById("signInPassword"),
   signInMessage: document.getElementById("signInMessage"),
   signUpUsername: document.getElementById("signUpUsername"),
-  signUpDisplayName: document.getElementById(
-    "signUpDisplayName"
-  ),
+  signUpDisplayName: document.getElementById("signUpDisplayName"),
   signUpEmail: document.getElementById("signUpEmail"),
   signUpPassword: document.getElementById("signUpPassword"),
   signUpMessage: document.getElementById("signUpMessage"),
 
-  confirmationEmail: document.getElementById(
-    "confirmationEmail"
-  ),
+  confirmationEmail: document.getElementById("confirmationEmail"),
   returnToSignInButton: document.getElementById(
     "returnToSignInButton"
   ),
 
   homeButton: document.getElementById("homeButton"),
   serverList: document.getElementById("serverList"),
-  createServerButton: document.getElementById(
-    "createServerButton"
-  ),
+  createServerButton: document.getElementById("createServerButton"),
   refreshServersButton: document.getElementById(
     "refreshServersButton"
   ),
 
-  navigationTitle: document.getElementById(
-    "navigationTitle"
-  ),
+  navigationTitle: document.getElementById("navigationTitle"),
   navigationSubtitle: document.getElementById(
     "navigationSubtitle"
   ),
-  homeNavigation: document.getElementById(
-    "homeNavigation"
-  ),
-  serverNavigation: document.getElementById(
-    "serverNavigation"
-  ),
-  serverDescription: document.getElementById(
-    "serverDescription"
-  ),
-  joinServerButton: document.getElementById(
-    "joinServerButton"
-  ),
+  homeNavigation: document.getElementById("homeNavigation"),
+  serverNavigation: document.getElementById("serverNavigation"),
+  serverDescription: document.getElementById("serverDescription"),
+  joinServerButton: document.getElementById("joinServerButton"),
   createChannelButton: document.getElementById(
     "createChannelButton"
   ),
@@ -151,12 +176,8 @@ const elements = {
   profileDisplayName: document.getElementById(
     "profileDisplayName"
   ),
-  profileUsername: document.getElementById(
-    "profileUsername"
-  ),
-  profilePlanButton: document.getElementById(
-    "profilePlanButton"
-  ),
+  profileUsername: document.getElementById("profileUsername"),
+  profilePlanButton: document.getElementById("profilePlanButton"),
   signOutButton: document.getElementById("signOutButton"),
 
   chatIcon: document.getElementById("chatIcon"),
@@ -168,12 +189,8 @@ const elements = {
   messageInput: document.getElementById("messageInput"),
   sendButton: document.getElementById("sendButton"),
   aiReplyButton: document.getElementById("aiReplyButton"),
-  composerStatus: document.getElementById(
-    "composerStatus"
-  ),
-  characterCount: document.getElementById(
-    "characterCount"
-  ),
+  composerStatus: document.getElementById("composerStatus"),
+  characterCount: document.getElementById("characterCount"),
 
   menuButton: document.getElementById("menuButton"),
   closeNavigationButton: document.getElementById(
@@ -195,44 +212,30 @@ const elements = {
   profilePanelUsername: document.getElementById(
     "profilePanelUsername"
   ),
-  profileBadgeList: document.getElementById(
-    "profileBadgeList"
-  ),
-  profilePanelBio: document.getElementById(
-    "profilePanelBio"
-  ),
-  editProfileButton: document.getElementById(
-    "editProfileButton"
-  ),
+  profileBadgeList: document.getElementById("profileBadgeList"),
+  profilePanelBio: document.getElementById("profilePanelBio"),
+  editProfileButton: document.getElementById("editProfileButton"),
   messageProfileButton: document.getElementById(
     "messageProfileButton"
   ),
-  callProfileButton: document.getElementById(
-    "callProfileButton"
-  ),
+  callProfileButton: document.getElementById("callProfileButton"),
   openCosmeticsButton: document.getElementById(
     "openCosmeticsButton"
   ),
   profileCosmeticsText: document.getElementById(
     "profileCosmeticsText"
   ),
-  copyUserIdButton: document.getElementById(
-    "copyUserIdButton"
-  ),
+  copyUserIdButton: document.getElementById("copyUserIdButton"),
 
   plansNavigationButton: document.getElementById(
     "plansNavigationButton"
   ),
   plansModal: document.getElementById("plansModal"),
-  closePlansButton: document.getElementById(
-    "closePlansButton"
-  ),
+  closePlansButton: document.getElementById("closePlansButton"),
   individualPlanButton: document.getElementById(
     "individualPlanButton"
   ),
-  familyPlanButton: document.getElementById(
-    "familyPlanButton"
-  ),
+  familyPlanButton: document.getElementById("familyPlanButton"),
   monthlyBillingButton: document.getElementById(
     "monthlyBillingButton"
   ),
@@ -241,32 +244,16 @@ const elements = {
   ),
   familyNote: document.getElementById("familyNote"),
   plusPrice: document.getElementById("plusPrice"),
-  plusPricePeriod: document.getElementById(
-    "plusPricePeriod"
-  ),
+  plusPricePeriod: document.getElementById("plusPricePeriod"),
   proPrice: document.getElementById("proPrice"),
-  proPricePeriod: document.getElementById(
-    "proPricePeriod"
-  ),
-  previewPlusButton: document.getElementById(
-    "previewPlusButton"
-  ),
-  previewProButton: document.getElementById(
-    "previewProButton"
-  ),
-  previewGiftButton: document.getElementById(
-    "previewGiftButton"
-  ),
+  proPricePeriod: document.getElementById("proPricePeriod"),
+  previewPlusButton: document.getElementById("previewPlusButton"),
+  previewProButton: document.getElementById("previewProButton"),
+  previewGiftButton: document.getElementById("previewGiftButton"),
 
-  createServerModal: document.getElementById(
-    "createServerModal"
-  ),
-  createServerForm: document.getElementById(
-    "createServerForm"
-  ),
-  serverNameInput: document.getElementById(
-    "serverNameInput"
-  ),
+  createServerModal: document.getElementById("createServerModal"),
+  createServerForm: document.getElementById("createServerForm"),
+  serverNameInput: document.getElementById("serverNameInput"),
   serverDescriptionInput: document.getElementById(
     "serverDescriptionInput"
   ),
@@ -276,19 +263,11 @@ const elements = {
   closeServerModalButton: document.getElementById(
     "closeServerModalButton"
   ),
-  cancelServerButton: document.getElementById(
-    "cancelServerButton"
-  ),
+  cancelServerButton: document.getElementById("cancelServerButton"),
 
-  createChannelModal: document.getElementById(
-    "createChannelModal"
-  ),
-  createChannelForm: document.getElementById(
-    "createChannelForm"
-  ),
-  channelNameInput: document.getElementById(
-    "channelNameInput"
-  ),
+  createChannelModal: document.getElementById("createChannelModal"),
+  createChannelForm: document.getElementById("createChannelForm"),
+  channelNameInput: document.getElementById("channelNameInput"),
   createChannelMessage: document.getElementById(
     "createChannelMessage"
   ),
@@ -299,18 +278,12 @@ const elements = {
     "cancelChannelButton"
   ),
 
-  profileEditModal: document.getElementById(
-    "profileEditModal"
-  ),
-  profileEditForm: document.getElementById(
-    "profileEditForm"
-  ),
+  profileEditModal: document.getElementById("profileEditModal"),
+  profileEditForm: document.getElementById("profileEditForm"),
   profileDisplayNameInput: document.getElementById(
     "profileDisplayNameInput"
   ),
-  profileBioInput: document.getElementById(
-    "profileBioInput"
-  ),
+  profileBioInput: document.getElementById("profileBioInput"),
   profileAvatarUrlInput: document.getElementById(
     "profileAvatarUrlInput"
   ),
@@ -333,17 +306,13 @@ const elements = {
   previewDescription: document.getElementById(
     "previewDescription"
   ),
-  closePreviewButton: document.getElementById(
-    "closePreviewButton"
-  )
+  closePreviewButton: document.getElementById("closePreviewButton")
 };
 
 function validateRequiredElements() {
   Object.entries(elements).forEach(([name, element]) => {
     if (!element) {
-      throw new Error(
-        `Missing required HTML element: ${name}`
-      );
+      throw new Error(`Missing required HTML element: ${name}`);
     }
   });
 }
@@ -367,16 +336,8 @@ function showAuth(mode) {
 function setAuthMode(mode) {
   const isSignIn = mode === "signin";
 
-  elements.signInTab.classList.toggle(
-    "active",
-    isSignIn
-  );
-
-  elements.signUpTab.classList.toggle(
-    "active",
-    !isSignIn
-  );
-
+  elements.signInTab.classList.toggle("active", isSignIn);
+  elements.signUpTab.classList.toggle("active", !isSignIn);
   elements.signInForm.hidden = !isSignIn;
   elements.signUpForm.hidden = isSignIn;
 
@@ -405,14 +366,10 @@ async function testConnection() {
   elements.connectionStatus.textContent =
     "Connecting to ColloTalk...";
 
-  elements.connectionStatus.classList.remove(
-    "connected",
-    "error"
-  );
+  elements.connectionStatus.classList.remove("connected", "error");
 
   try {
-    const { error } =
-      await supabaseClient.auth.getSession();
+    const { error } = await supabaseClient.auth.getSession();
 
     if (error) {
       throw error;
@@ -421,9 +378,7 @@ async function testConnection() {
     elements.connectionStatus.textContent =
       "ColloTalk services are online";
 
-    elements.connectionStatus.classList.add(
-      "connected"
-    );
+    elements.connectionStatus.classList.add("connected");
   } catch (error) {
     console.error("Connection error:", error);
 
@@ -444,11 +399,8 @@ async function signUp(event) {
   const displayName =
     elements.signUpDisplayName.value.trim();
 
-  const email =
-    elements.signUpEmail.value.trim();
-
-  const password =
-    elements.signUpPassword.value;
+  const email = elements.signUpEmail.value.trim();
+  const password = elements.signUpPassword.value;
 
   if (!/^[a-z0-9_]{3,24}$/.test(username)) {
     setFormMessage(
@@ -466,19 +418,18 @@ async function signUp(event) {
   );
 
   try {
-    const { data, error } =
-      await supabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo:
-            "https://heowoibleriemc.github.io/ColloTalk/",
-          data: {
-            username,
-            display_name: displayName
-          }
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo:
+          "https://heowoibleriemc.github.io/ColloTalk/",
+        data: {
+          username,
+          display_name: displayName
         }
-      });
+      }
+    });
 
     if (error) {
       throw error;
@@ -496,10 +447,7 @@ async function signUp(event) {
 
     setFormMessage(
       elements.signUpMessage,
-      getErrorMessage(
-        error,
-        "Account creation failed."
-      )
+      getErrorMessage(error, "Account creation failed.")
     );
   }
 }
@@ -507,11 +455,8 @@ async function signUp(event) {
 async function signIn(event) {
   event.preventDefault();
 
-  const email =
-    elements.signInEmail.value.trim();
-
-  const password =
-    elements.signInPassword.value;
+  const email = elements.signInEmail.value.trim();
+  const password = elements.signInPassword.value;
 
   setFormMessage(
     elements.signInMessage,
@@ -589,8 +534,7 @@ async function enterApplication(session) {
 
   await loadProfile();
   await loadServers();
-
-  renderHomeState();
+  await renderHomeState();
 }
 
 function getProfileStyleStorageKey() {
@@ -619,10 +563,7 @@ function loadProfileStyle() {
         ? parsedStyle.backgroundUrl
         : "";
   } catch (error) {
-    console.error(
-      "Profile style load error:",
-      error
-    );
+    console.error("Profile style load error:", error);
   }
 }
 
@@ -648,18 +589,20 @@ async function loadProfile() {
     state.profile = {
       id: state.user.id,
       username:
-        state.user.user_metadata?.username ||
-        "user",
+        state.user.user_metadata?.username || "user",
       display_name:
-        state.user.user_metadata?.display_name ||
-        "User",
+        state.user.user_metadata?.display_name || "User",
       avatar_url: null,
       bio: "",
       plan: "free",
-      created_at: state.user.created_at
+      created_at: state.user.created_at,
+      badges: []
     };
   } else {
-    state.profile = data;
+    state.profile = {
+      ...data,
+      badges: []
+    };
   }
 
   renderCurrentProfile();
@@ -671,12 +614,9 @@ function renderCurrentProfile() {
   }
 
   const displayName =
-    state.profile.display_name ||
-    state.profile.username;
+    state.profile.display_name || state.profile.username;
 
-  elements.profileDisplayName.textContent =
-    displayName;
-
+  elements.profileDisplayName.textContent = displayName;
   elements.profileUsername.textContent =
     `@${state.profile.username}`;
 
@@ -723,12 +663,8 @@ function renderPlanButton() {
     "plan-pro"
   );
 
-  elements.profilePlanButton.classList.add(
-    `plan-${plan}`
-  );
-
-  elements.profilePlanButton.textContent =
-    plan.toUpperCase();
+  elements.profilePlanButton.classList.add(`plan-${plan}`);
+  elements.profilePlanButton.textContent = plan.toUpperCase();
 }
 
 function updateAiButton() {
@@ -762,10 +698,7 @@ async function loadServers() {
 
     showMessageState(
       "Server error",
-      getErrorMessage(
-        error,
-        "Servers could not be loaded."
-      )
+      getErrorMessage(error, "Servers could not be loaded.")
     );
 
     return;
@@ -779,17 +712,11 @@ function renderServers() {
   elements.serverList.replaceChildren();
 
   state.servers.forEach((server) => {
-    const button = document.createElement(
-      "button"
-    );
+    const button = document.createElement("button");
 
-    button.className =
-      "rail-button server-button";
-
+    button.className = "rail-button server-button";
     button.type = "button";
-    button.textContent =
-      getServerShortName(server.name);
-
+    button.textContent = getServerShortName(server.name);
     button.title = server.name;
 
     button.setAttribute(
@@ -797,9 +724,7 @@ function renderServers() {
       `Open ${server.name}`
     );
 
-    if (
-      state.selectedServer?.id === server.id
-    ) {
+    if (state.selectedServer?.id === server.id) {
       button.classList.add("active");
     }
 
@@ -829,16 +754,10 @@ async function selectServer(serverId) {
 
   elements.homeNavigation.hidden = true;
   elements.serverNavigation.hidden = false;
-
-  elements.navigationTitle.textContent =
-    server.name;
-
-  elements.navigationSubtitle.textContent =
-    "Community server";
-
+  elements.navigationTitle.textContent = server.name;
+  elements.navigationSubtitle.textContent = "Community server";
   elements.serverDescription.textContent =
-    server.description ||
-    "No server description.";
+    server.description || "No server description.";
 
   await loadMembership();
   renderMembershipControls();
@@ -857,10 +776,7 @@ async function loadMembership() {
     .maybeSingle();
 
   if (error) {
-    console.error(
-      "Membership load error:",
-      error
-    );
+    console.error("Membership load error:", error);
   }
 
   state.membership = error ? null : data;
@@ -871,15 +787,10 @@ function renderMembershipControls() {
 
   const canManage =
     state.membership &&
-    ["owner", "admin"].includes(
-      state.membership.role
-    );
+    ["owner", "admin"].includes(state.membership.role);
 
-  elements.joinServerButton.hidden =
-    isMember;
-
-  elements.createChannelButton.hidden =
-    !canManage;
+  elements.joinServerButton.hidden = isMember;
+  elements.createChannelButton.hidden = !canManage;
 }
 
 async function joinSelectedServer() {
@@ -888,8 +799,7 @@ async function joinSelectedServer() {
   }
 
   elements.joinServerButton.disabled = true;
-  elements.joinServerButton.textContent =
-    "Joining...";
+  elements.joinServerButton.textContent = "Joining...";
 
   const { error } = await supabaseClient
     .from("server_members")
@@ -900,8 +810,7 @@ async function joinSelectedServer() {
     });
 
   elements.joinServerButton.disabled = false;
-  elements.joinServerButton.textContent =
-    "Join Server";
+  elements.joinServerButton.textContent = "Join Server";
 
   if (error) {
     openPreview(
@@ -925,16 +834,13 @@ async function loadChannels() {
   elements.channelList.replaceChildren();
 
   if (!state.membership) {
-    const message =
-      document.createElement("p");
+    const message = document.createElement("p");
 
     message.className = "empty-list";
-
     message.textContent =
       "Join this server to view its channels.";
 
     elements.channelList.appendChild(message);
-
     elements.composer.hidden = true;
 
     showMessageState(
@@ -963,10 +869,7 @@ async function loadChannels() {
 
     showMessageState(
       "Channel error",
-      getErrorMessage(
-        error,
-        "Channels could not be loaded."
-      )
+      getErrorMessage(error, "Channels could not be loaded.")
     );
 
     return;
@@ -979,8 +882,7 @@ async function loadChannels() {
     const selected =
       state.channels.find(
         (channel) =>
-          channel.id ===
-          state.selectedChannel?.id
+          channel.id === state.selectedChannel?.id
       ) || state.channels[0];
 
     await selectChannel(selected.id);
@@ -998,28 +900,20 @@ function renderChannels() {
   elements.channelList.replaceChildren();
 
   state.channels.forEach((channel) => {
-    const button =
-      document.createElement("button");
+    const button = document.createElement("button");
 
     button.className = "channel-button";
     button.type = "button";
 
-    if (
-      state.selectedChannel?.id ===
-      channel.id
-    ) {
+    if (state.selectedChannel?.id === channel.id) {
       button.classList.add("active");
     }
 
-    const symbol =
-      document.createElement("span");
-
+    const symbol = document.createElement("span");
     symbol.className = "channel-symbol";
     symbol.textContent = "#";
 
-    const name =
-      document.createElement("span");
-
+    const name = document.createElement("span");
     name.textContent = channel.name;
 
     button.append(symbol, name);
@@ -1049,10 +943,7 @@ async function selectChannel(channelId) {
   renderChannels();
 
   elements.chatIcon.textContent = "#";
-
-  elements.chatTitle.textContent =
-    `# ${channel.name}`;
-
+  elements.chatTitle.textContent = `# ${channel.name}`;
   elements.chatSubtitle.textContent =
     state.selectedServer.name;
 
@@ -1089,10 +980,7 @@ async function loadMessages() {
         created_at
       )
     `)
-    .eq(
-      "channel_id",
-      state.selectedChannel.id
-    )
+    .eq("channel_id", state.selectedChannel.id)
     .order("created_at", {
       ascending: true
     })
@@ -1103,10 +991,7 @@ async function loadMessages() {
 
     showMessageState(
       "Message error",
-      getErrorMessage(
-        error,
-        "Messages could not be loaded."
-      )
+      getErrorMessage(error, "Messages could not be loaded.")
     );
 
     return;
@@ -1146,8 +1031,7 @@ function normalizeJoinedProfile(value) {
 }
 
 function createMessageElement(message) {
-  const profile =
-    normalizeJoinedProfile(message.profiles);
+  const profile = normalizeJoinedProfile(message.profiles);
 
   const displayName =
     profile.display_name ||
@@ -1157,17 +1041,14 @@ function createMessageElement(message) {
   const isOwnMessage =
     message.sender_id === state.user.id;
 
-  const article =
-    document.createElement("article");
-
+  const article = document.createElement("article");
   article.className = "message";
 
   if (isOwnMessage) {
     article.classList.add("own-message");
   }
 
-  const avatar =
-    document.createElement("button");
+  const avatar = document.createElement("button");
 
   avatar.className = isOwnMessage
     ? "avatar avatar-blue"
@@ -1189,33 +1070,24 @@ function createMessageElement(message) {
   avatar.addEventListener("click", () => {
     openProfilePanel({
       ...profile,
-      id: message.sender_id
+      id: message.sender_id,
+      badges: []
     });
   });
 
-  const body =
-    document.createElement("div");
+  const body = document.createElement("div");
 
-  const meta =
-    document.createElement("div");
-
+  const meta = document.createElement("div");
   meta.className = "message-meta";
 
-  const author =
-    document.createElement("strong");
-
+  const author = document.createElement("strong");
   author.textContent = displayName;
 
-  const time =
-    document.createElement("time");
-
+  const time = document.createElement("time");
   time.dateTime = message.created_at;
-  time.textContent =
-    formatTime(message.created_at);
+  time.textContent = formatTime(message.created_at);
 
-  const bubble =
-    document.createElement("div");
-
+  const bubble = document.createElement("div");
   bubble.className = "message-bubble";
   bubble.textContent = message.content;
 
@@ -1229,8 +1101,7 @@ function createMessageElement(message) {
 async function sendMessage(event) {
   event.preventDefault();
 
-  const content =
-    elements.messageInput.value.trim();
+  const content = elements.messageInput.value.trim();
 
   if (
     !content ||
@@ -1241,8 +1112,7 @@ async function sendMessage(event) {
   }
 
   elements.sendButton.disabled = true;
-  elements.composerStatus.textContent =
-    "Sending...";
+  elements.composerStatus.textContent = "Sending...";
 
   const { error } = await supabaseClient
     .from("messages")
@@ -1256,18 +1126,14 @@ async function sendMessage(event) {
     console.error("Message send error:", error);
 
     elements.composerStatus.textContent =
-      getErrorMessage(
-        error,
-        "Message failed"
-      );
+      getErrorMessage(error, "Message failed");
 
     updateComposer();
     return;
   }
 
   elements.messageInput.value = "";
-  elements.composerStatus.textContent =
-    "Connected";
+  elements.composerStatus.textContent = "Connected";
 
   updateComposer();
 }
@@ -1277,8 +1143,7 @@ function subscribeToMessages() {
     return;
   }
 
-  const channelId =
-    state.selectedChannel.id;
+  const channelId = state.selectedChannel.id;
 
   state.realtimeChannel = supabaseClient
     .channel(`messages:${channelId}`)
@@ -1288,14 +1153,10 @@ function subscribeToMessages() {
         event: "*",
         schema: "public",
         table: "messages",
-        filter:
-          `channel_id=eq.${channelId}`
+        filter: `channel_id=eq.${channelId}`
       },
       async () => {
-        if (
-          state.selectedChannel?.id ===
-          channelId
-        ) {
+        if (state.selectedChannel?.id === channelId) {
           await loadMessages();
         }
       }
@@ -1330,8 +1191,7 @@ async function unsubscribeFromMessages() {
 async function createServer(event) {
   event.preventDefault();
 
-  const name =
-    elements.serverNameInput.value.trim();
+  const name = elements.serverNameInput.value.trim();
 
   const description =
     elements.serverDescriptionInput.value.trim();
@@ -1359,10 +1219,7 @@ async function createServer(event) {
   if (error) {
     setFormMessage(
       elements.createServerMessage,
-      getErrorMessage(
-        error,
-        "Server creation failed."
-      )
+      getErrorMessage(error, "Server creation failed.")
     );
 
     return;
@@ -1391,7 +1248,6 @@ async function createServer(event) {
   }
 
   closeServerModal();
-
   await loadServers();
   await selectServer(server.id);
 }
@@ -1403,10 +1259,9 @@ async function createChannel(event) {
     return;
   }
 
-  const name =
-    elements.channelNameInput.value
-      .trim()
-      .toLowerCase();
+  const name = elements.channelNameInput.value
+    .trim()
+    .toLowerCase();
 
   if (!/^[a-z0-9_-]{1,40}$/.test(name)) {
     setFormMessage(
@@ -1440,17 +1295,13 @@ async function createChannel(event) {
   if (error) {
     setFormMessage(
       elements.createChannelMessage,
-      getErrorMessage(
-        error,
-        "Channel creation failed."
-      )
+      getErrorMessage(error, "Channel creation failed.")
     );
 
     return;
   }
 
   closeChannelModal();
-
   await loadChannels();
   await selectChannel(data.id);
 }
@@ -1458,25 +1309,17 @@ async function createChannel(event) {
 function showMessageState(title, description) {
   elements.messageArea.replaceChildren();
 
-  const wrapper =
-    document.createElement("div");
-
+  const wrapper = document.createElement("div");
   wrapper.className = "empty-state";
 
-  const icon =
-    document.createElement("div");
-
+  const icon = document.createElement("div");
   icon.className = "empty-state-icon";
   icon.textContent = getInitial(title);
 
-  const heading =
-    document.createElement("h3");
-
+  const heading = document.createElement("h3");
   heading.textContent = title;
 
-  const paragraph =
-    document.createElement("p");
-
+  const paragraph = document.createElement("p");
   paragraph.textContent = description;
 
   wrapper.append(icon, heading, paragraph);
@@ -1494,10 +1337,7 @@ async function renderHomeState() {
 
   elements.homeNavigation.hidden = false;
   elements.serverNavigation.hidden = true;
-
-  elements.navigationTitle.textContent =
-    "ColloTalk";
-
+  elements.navigationTitle.textContent = "ColloTalk";
   elements.navigationSubtitle.textContent =
     "Online conversations";
 
@@ -1525,8 +1365,7 @@ async function renderHomeState() {
 }
 
 function updateComposer() {
-  const value =
-    elements.messageInput.value;
+  const value = elements.messageInput.value;
 
   elements.characterCount.textContent =
     `${value.length} / 2000`;
@@ -1534,8 +1373,7 @@ function updateComposer() {
   elements.sendButton.disabled =
     value.trim().length === 0;
 
-  elements.messageInput.style.height =
-    "auto";
+  elements.messageInput.style.height = "auto";
 
   elements.messageInput.style.height =
     `${Math.min(
@@ -1544,9 +1382,7 @@ function updateComposer() {
     )}px`;
 }
 
-function openProfilePanel(
-  profile = state.profile
-) {
+function openProfilePanel(profile = state.profile) {
   if (!profile) {
     return;
   }
@@ -1587,9 +1423,7 @@ function openProfilePanel(
   renderProfileActions(profile);
 
   elements.profilePanel.hidden = false;
-  elements.mobileOverlay.classList.add(
-    "visible"
-  );
+  elements.mobileOverlay.classList.add("visible");
 }
 
 function closeProfilePanel() {
@@ -1601,74 +1435,133 @@ function closeProfilePanel() {
       "navigation-open"
     )
   ) {
-    elements.mobileOverlay.classList.remove(
-      "visible"
-    );
+    elements.mobileOverlay.classList.remove("visible");
   }
 }
 
 function renderProfileBadges(profile) {
   elements.profileBadgeList.replaceChildren();
 
-  if (isOfficialOwner(profile)) {
+  const badgeKeys = getProfileBadgeKeys(profile);
+
+  badgeKeys.forEach((badgeKey) => {
     elements.profileBadgeList.appendChild(
-      createProfileBadge(
-        "Owner",
-        "owner"
-      )
+      createProfileBadge(badgeKey)
     );
+  });
+
+  const plan = getEffectivePlan(profile);
+
+  if (plan === "pro") {
+    elements.profileCosmeticsText.textContent =
+      "Plus and Pro cosmetics included";
+    return;
+  }
+
+  if (plan === "plus") {
+    elements.profileCosmeticsText.textContent =
+      "Plus cosmetics included";
+    return;
+  }
+
+  elements.profileCosmeticsText.textContent =
+    "Free and permanently purchased cosmetics";
+}
+
+function getProfileBadgeKeys(profile) {
+  const badgeKeys = [];
+
+  if (isOfficialOwner(profile)) {
+    badgeKeys.push("owner");
   }
 
   const plan = getEffectivePlan(profile);
 
-  if (plan === "plus" || plan === "pro") {
-    elements.profileBadgeList.appendChild(
-      createProfileBadge(plan, plan)
-    );
+  if (plan === "pro") {
+    badgeKeys.push("pro");
+  } else if (plan === "plus") {
+    badgeKeys.push("plus");
   }
 
-  elements.profileCosmeticsText.textContent =
-    plan === "pro"
-      ? "Plus and Pro cosmetics included"
-      : plan === "plus"
-        ? "Plus cosmetics included"
-        : "Free and permanently purchased cosmetics";
+  const assignedBadges = Array.isArray(profile.badges)
+    ? profile.badges
+    : [];
+
+  assignedBadges.forEach((badgeKey) => {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        BADGE_IMAGES,
+        badgeKey
+      ) &&
+      !badgeKeys.includes(badgeKey)
+    ) {
+      badgeKeys.push(badgeKey);
+    }
+  });
+
+  return badgeKeys;
 }
 
-function createProfileBadge(
-  label,
-  className
-) {
-  const badge =
-    document.createElement("span");
+function createProfileBadge(badgeKey) {
+  const information = BADGE_INFORMATION[badgeKey];
+  const imagePath = BADGE_IMAGES[badgeKey];
 
-  badge.className =
-    `profile-badge ${className}`;
+  const button = document.createElement("button");
 
-  badge.textContent = label;
+  button.className =
+    `profile-image-badge badge-${badgeKey}`;
 
-  return badge;
+  button.type = "button";
+  button.title =
+    information?.label || "ColloTalk Badge";
+
+  button.setAttribute(
+    "aria-label",
+    information?.label || "ColloTalk Badge"
+  );
+
+  const image = document.createElement("img");
+
+  image.src = imagePath;
+
+  image.alt =
+    `${information?.label || "ColloTalk"} badge`;
+
+  image.loading = "lazy";
+  image.draggable = false;
+
+  image.addEventListener("error", () => {
+    button.classList.add("badge-image-error");
+    button.textContent =
+      information?.label?.charAt(0) || "?";
+  });
+
+  button.appendChild(image);
+
+  button.addEventListener("click", () => {
+    openPreview(
+      `${information?.label || "ColloTalk"} Badge`,
+      information?.description ||
+        "Official ColloTalk badge.",
+      information?.label?.charAt(0) || "B"
+    );
+  });
+
+  return button;
 }
 
 function renderProfileActions(profile) {
   const isOwnProfile =
     profile.id === state.user?.id;
 
-  elements.editProfileButton.hidden =
-    !isOwnProfile;
-
-  elements.messageProfileButton.hidden =
-    isOwnProfile;
-
-  elements.callProfileButton.hidden =
-    isOwnProfile;
+  elements.editProfileButton.hidden = !isOwnProfile;
+  elements.messageProfileButton.hidden = isOwnProfile;
+  elements.callProfileButton.hidden = isOwnProfile;
 }
 
 function applyProfileCover(backgroundUrl) {
   if (!backgroundUrl) {
-    elements.profileCover.style
-      .backgroundImage = "";
-
+    elements.profileCover.style.backgroundImage = "";
     return;
   }
 
@@ -1697,13 +1590,9 @@ function openProfileEditModal() {
     state.profile.avatar_url || "";
 
   elements.profileBackgroundUrlInput.value =
-    state.profileStyle.backgroundUrl ||
-    "";
+    state.profileStyle.backgroundUrl || "";
 
-  setFormMessage(
-    elements.profileEditMessage,
-    ""
-  );
+  setFormMessage(elements.profileEditMessage, "");
 
   if (!elements.profileEditModal.open) {
     elements.profileEditModal.showModal();
@@ -1749,8 +1638,7 @@ async function saveProfileEdits(event) {
   const { data, error } = await supabaseClient
     .from("profiles")
     .update({
-      display_name:
-        displayName.slice(0, 40),
+      display_name: displayName.slice(0, 40),
       bio: bio.slice(0, 300),
       avatar_url: avatarUrl || null
     })
@@ -1763,18 +1651,18 @@ async function saveProfileEdits(event) {
   if (error) {
     setFormMessage(
       elements.profileEditMessage,
-      getErrorMessage(
-        error,
-        "Profile update failed."
-      )
+      getErrorMessage(error, "Profile update failed.")
     );
 
     return;
   }
 
-  state.profile = data;
-  state.profileStyle.backgroundUrl =
-    backgroundUrl;
+  state.profile = {
+    ...data,
+    badges: state.profile?.badges || []
+  };
+
+  state.profileStyle.backgroundUrl = backgroundUrl;
 
   saveProfileStyle();
   renderCurrentProfile();
@@ -1787,9 +1675,7 @@ function setAvatarElement(
   imageUrl,
   fallbackName
 ) {
-  element.textContent =
-    getInitial(fallbackName);
-
+  element.textContent = getInitial(fallbackName);
   element.style.backgroundImage = "";
 
   if (!imageUrl) {
@@ -1800,15 +1686,12 @@ function setAvatarElement(
 
   image.addEventListener("load", () => {
     element.textContent = "";
-
     element.style.backgroundImage =
       `url("${escapeCssUrl(imageUrl)}")`;
   });
 
   image.addEventListener("error", () => {
-    element.textContent =
-      getInitial(fallbackName);
-
+    element.textContent = getInitial(fallbackName);
     element.style.backgroundImage = "";
   });
 
@@ -1832,17 +1715,15 @@ function closePlansModal() {
 function setPlanAudience(audience) {
   state.planAudience = audience;
 
-  elements.individualPlanButton
-    .classList.toggle(
-      "active",
-      audience === "individual"
-    );
+  elements.individualPlanButton.classList.toggle(
+    "active",
+    audience === "individual"
+  );
 
-  elements.familyPlanButton
-    .classList.toggle(
-      "active",
-      audience === "family"
-    );
+  elements.familyPlanButton.classList.toggle(
+    "active",
+    audience === "family"
+  );
 
   elements.familyNote.hidden =
     audience !== "family";
@@ -1853,38 +1734,27 @@ function setPlanAudience(audience) {
 function setBillingPeriod(period) {
   state.billingPeriod = period;
 
-  elements.monthlyBillingButton
-    .classList.toggle(
-      "active",
-      period === "monthly"
-    );
+  elements.monthlyBillingButton.classList.toggle(
+    "active",
+    period === "monthly"
+  );
 
-  elements.yearlyBillingButton
-    .classList.toggle(
-      "active",
-      period === "yearly"
-    );
+  elements.yearlyBillingButton.classList.toggle(
+    "active",
+    period === "yearly"
+  );
 
   updatePlanPricing();
 }
 
 function updatePlanPricing() {
   const prices =
-    PLAN_PRICES[state.planAudience][
-      state.billingPeriod
-    ];
+    PLAN_PRICES[state.planAudience][state.billingPeriod];
 
-  elements.plusPrice.textContent =
-    prices.plus;
-
-  elements.proPrice.textContent =
-    prices.pro;
-
-  elements.plusPricePeriod.textContent =
-    prices.period;
-
-  elements.proPricePeriod.textContent =
-    prices.period;
+  elements.plusPrice.textContent = prices.plus;
+  elements.proPrice.textContent = prices.pro;
+  elements.plusPricePeriod.textContent = prices.period;
+  elements.proPricePeriod.textContent = prices.period;
 
   const familySuffix =
     state.planAudience === "family"
@@ -1928,8 +1798,7 @@ function previewPlan(plan) {
 }
 
 function handleAiReply() {
-  const plan =
-    getEffectivePlan(state.profile);
+  const plan = getEffectivePlan(state.profile);
 
   if (plan !== "pro") {
     openPreview(
@@ -1954,10 +1823,8 @@ function openPreview(
   icon = "C"
 ) {
   elements.previewTitle.textContent = title;
-
   elements.previewDescription.textContent =
     description;
-
   elements.previewIcon.textContent = icon;
 
   if (!elements.previewModal.open) {
@@ -1981,9 +1848,7 @@ async function copyCurrentUserId() {
   }
 
   try {
-    await navigator.clipboard.writeText(
-      userId
-    );
+    await navigator.clipboard.writeText(userId);
 
     openPreview(
       "User ID Copied",
@@ -2003,14 +1868,9 @@ async function copyCurrentUserId() {
 
 function openServerModal() {
   elements.serverNameInput.value = "";
+  elements.serverDescriptionInput.value = "";
 
-  elements.serverDescriptionInput.value =
-    "";
-
-  setFormMessage(
-    elements.createServerMessage,
-    ""
-  );
+  setFormMessage(elements.createServerMessage, "");
 
   if (!elements.createServerModal.open) {
     elements.createServerModal.showModal();
@@ -2030,10 +1890,7 @@ function closeServerModal() {
 function openChannelModal() {
   elements.channelNameInput.value = "";
 
-  setFormMessage(
-    elements.createChannelMessage,
-    ""
-  );
+  setFormMessage(elements.createChannelMessage, "");
 
   if (!elements.createChannelModal.open) {
     elements.createChannelModal.showModal();
@@ -2051,24 +1908,15 @@ function closeChannelModal() {
 }
 
 function openNavigation() {
-  elements.appShell.classList.add(
-    "navigation-open"
-  );
-
-  elements.mobileOverlay.classList.add(
-    "visible"
-  );
+  elements.appShell.classList.add("navigation-open");
+  elements.mobileOverlay.classList.add("visible");
 }
 
 function closeNavigation() {
-  elements.appShell.classList.remove(
-    "navigation-open"
-  );
+  elements.appShell.classList.remove("navigation-open");
 
   if (elements.profilePanel.hidden) {
-    elements.mobileOverlay.classList.remove(
-      "visible"
-    );
+    elements.mobileOverlay.classList.remove("visible");
   }
 }
 
@@ -2078,8 +1926,7 @@ function closeAllPanels() {
 }
 
 function getInitial(value) {
-  const text =
-    String(value || "").trim();
+  const text = String(value || "").trim();
 
   return text
     ? Array.from(text)[0].toUpperCase()
@@ -2096,9 +1943,7 @@ function getServerShortName(name) {
     return `${getInitial(words[0])}${getInitial(words[1])}`;
   }
 
-  return Array.from(
-    String(name || "").trim()
-  )
+  return Array.from(String(name || "").trim())
     .slice(0, 2)
     .join("")
     .toUpperCase();
@@ -2111,13 +1956,10 @@ function formatTime(value) {
     return "";
   }
 
-  return new Intl.DateTimeFormat(
-    undefined,
-    {
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-  ).format(date);
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(date);
 }
 
 function scrollToBottom() {
@@ -2135,19 +1977,17 @@ function setupEvents() {
     }
   );
 
-  elements.signInLandingButton
-    .addEventListener(
-      "click",
-      () => {
-        showAuth("signin");
-      }
-    );
+  elements.signInLandingButton.addEventListener(
+    "click",
+    () => {
+      showAuth("signin");
+    }
+  );
 
-  elements.landingPlansButton
-    .addEventListener(
-      "click",
-      openPlansModal
-    );
+  elements.landingPlansButton.addEventListener(
+    "click",
+    openPlansModal
+  );
 
   elements.authBackButton.addEventListener(
     "click",
@@ -2180,13 +2020,12 @@ function setupEvents() {
     signUp
   );
 
-  elements.returnToSignInButton
-    .addEventListener(
-      "click",
-      () => {
-        showAuth("signin");
-      }
-    );
+  elements.returnToSignInButton.addEventListener(
+    "click",
+    () => {
+      showAuth("signin");
+    }
+  );
 
   elements.signOutButton.addEventListener(
     "click",
@@ -2198,65 +2037,55 @@ function setupEvents() {
     renderHomeState
   );
 
-  elements.refreshServersButton
-    .addEventListener(
-      "click",
-      loadServers
-    );
+  elements.refreshServersButton.addEventListener(
+    "click",
+    loadServers
+  );
 
-  elements.createServerButton
-    .addEventListener(
-      "click",
-      openServerModal
-    );
+  elements.createServerButton.addEventListener(
+    "click",
+    openServerModal
+  );
 
-  elements.createServerForm
-    .addEventListener(
-      "submit",
-      createServer
-    );
+  elements.createServerForm.addEventListener(
+    "submit",
+    createServer
+  );
 
-  elements.closeServerModalButton
-    .addEventListener(
-      "click",
-      closeServerModal
-    );
+  elements.closeServerModalButton.addEventListener(
+    "click",
+    closeServerModal
+  );
 
-  elements.cancelServerButton
-    .addEventListener(
-      "click",
-      closeServerModal
-    );
+  elements.cancelServerButton.addEventListener(
+    "click",
+    closeServerModal
+  );
 
-  elements.joinServerButton
-    .addEventListener(
-      "click",
-      joinSelectedServer
-    );
+  elements.joinServerButton.addEventListener(
+    "click",
+    joinSelectedServer
+  );
 
-  elements.createChannelButton
-    .addEventListener(
-      "click",
-      openChannelModal
-    );
+  elements.createChannelButton.addEventListener(
+    "click",
+    openChannelModal
+  );
 
-  elements.createChannelForm
-    .addEventListener(
-      "submit",
-      createChannel
-    );
+  elements.createChannelForm.addEventListener(
+    "submit",
+    createChannel
+  );
 
-  elements.closeChannelModalButton
-    .addEventListener(
-      "click",
-      closeChannelModal
-    );
+  elements.closeChannelModalButton.addEventListener(
+    "click",
+    closeChannelModal
+  );
 
-  elements.cancelChannelButton
-    .addEventListener(
-      "click",
-      closeChannelModal
-    );
+  elements.cancelChannelButton.addEventListener(
+    "click",
+    closeChannelModal
+  );
 
   elements.messageForm.addEventListener(
     "submit",
@@ -2292,11 +2121,10 @@ function setupEvents() {
     openNavigation
   );
 
-  elements.closeNavigationButton
-    .addEventListener(
-      "click",
-      closeNavigation
-    );
+  elements.closeNavigationButton.addEventListener(
+    "click",
+    closeNavigation
+  );
 
   elements.mobileOverlay.addEventListener(
     "click",
@@ -2310,178 +2138,154 @@ function setupEvents() {
     }
   );
 
-  elements.profileInformationButton
-    .addEventListener(
-      "click",
-      () => {
-        openProfilePanel(state.profile);
-      }
-    );
-
-  elements.profilePlanButton
-    .addEventListener(
-      "click",
-      openPlansModal
-    );
-
-  elements.closeProfilePanelButton
-    .addEventListener(
-      "click",
-      closeProfilePanel
-    );
-
-  elements.editProfileButton
-    .addEventListener(
-      "click",
-      openProfileEditModal
-    );
-
-  elements.messageProfileButton
-    .addEventListener(
-      "click",
-      () => {
-        openPreview(
-          "Direct Messages",
-          "Direct messages are planned but are not active in this prototype.",
-          "M"
-        );
-      }
-    );
-
-  elements.callProfileButton
-    .addEventListener(
-      "click",
-      () => {
-        openPreview(
-          "Voice Calls",
-          "Voice calls are planned but are not active in this prototype.",
-          "C"
-        );
-      }
-    );
-
-  elements.openCosmeticsButton
-    .addEventListener(
-      "click",
-      () => {
-        openPreview(
-          "Collo Cosmetics",
-          "Cosmetics are generally paid items. Plus members receive Plus cosmetics while subscribed. Pro members receive both Plus and Pro cosmetics while subscribed. Permanently purchased cosmetics remain available after a subscription ends.",
-          "C"
-        );
-      }
-    );
-
-  elements.copyUserIdButton
-    .addEventListener(
-      "click",
-      copyCurrentUserId
-    );
-
-  elements.profileEditForm
-    .addEventListener(
-      "submit",
-      saveProfileEdits
-    );
-
-  elements.closeProfileEditButton
-    .addEventListener(
-      "click",
-      closeProfileEditModal
-    );
-
-  elements.cancelProfileEditButton
-    .addEventListener(
-      "click",
-      closeProfileEditModal
-    );
-
-  elements.plansNavigationButton
-    .addEventListener(
-      "click",
-      openPlansModal
-    );
-
-  elements.closePlansButton
-    .addEventListener(
-      "click",
-      closePlansModal
-    );
-
-  elements.individualPlanButton
-    .addEventListener(
-      "click",
-      () => {
-        setPlanAudience("individual");
-      }
-    );
-
-  elements.familyPlanButton
-    .addEventListener(
-      "click",
-      () => {
-        setPlanAudience("family");
-      }
-    );
-
-  elements.monthlyBillingButton
-    .addEventListener(
-      "click",
-      () => {
-        setBillingPeriod("monthly");
-      }
-    );
-
-  elements.yearlyBillingButton
-    .addEventListener(
-      "click",
-      () => {
-        setBillingPeriod("yearly");
-      }
-    );
-
-  elements.previewPlusButton
-    .addEventListener(
-      "click",
-      () => {
-        previewPlan("Plus");
-      }
-    );
-
-  elements.previewProButton
-    .addEventListener(
-      "click",
-      () => {
-        previewPlan("Pro");
-      }
-    );
-
-  elements.previewGiftButton
-    .addEventListener(
-      "click",
-      () => {
-        openPreview(
-          "Collo Gifts",
-          "Collo Plus and Collo Pro will be giftable for selected durations. Gift memberships will not renew automatically.",
-          "G"
-        );
-      }
-    );
-
-  elements.closePreviewButton
-    .addEventListener(
-      "click",
-      closePreview
-    );
-
-  window.addEventListener(
-    "resize",
+  elements.profileInformationButton.addEventListener(
+    "click",
     () => {
-      if (window.innerWidth > 780) {
-        closeNavigation();
-      }
+      openProfilePanel(state.profile);
     }
   );
+
+  elements.profilePlanButton.addEventListener(
+    "click",
+    openPlansModal
+  );
+
+  elements.closeProfilePanelButton.addEventListener(
+    "click",
+    closeProfilePanel
+  );
+
+  elements.editProfileButton.addEventListener(
+    "click",
+    openProfileEditModal
+  );
+
+  elements.messageProfileButton.addEventListener(
+    "click",
+    () => {
+      openPreview(
+        "Direct Messages",
+        "Direct messages are planned but are not active in this prototype.",
+        "M"
+      );
+    }
+  );
+
+  elements.callProfileButton.addEventListener(
+    "click",
+    () => {
+      openPreview(
+        "Voice Calls",
+        "Voice calls are planned but are not active in this prototype.",
+        "C"
+      );
+    }
+  );
+
+  elements.openCosmeticsButton.addEventListener(
+    "click",
+    () => {
+      openPreview(
+        "Collo Cosmetics",
+        "Cosmetics are generally paid items. Plus members receive Plus cosmetics while subscribed. Pro members receive both Plus and Pro cosmetics while subscribed. Permanently purchased cosmetics remain available after a subscription ends.",
+        "C"
+      );
+    }
+  );
+
+  elements.copyUserIdButton.addEventListener(
+    "click",
+    copyCurrentUserId
+  );
+
+  elements.profileEditForm.addEventListener(
+    "submit",
+    saveProfileEdits
+  );
+
+  elements.closeProfileEditButton.addEventListener(
+    "click",
+    closeProfileEditModal
+  );
+
+  elements.cancelProfileEditButton.addEventListener(
+    "click",
+    closeProfileEditModal
+  );
+
+  elements.plansNavigationButton.addEventListener(
+    "click",
+    openPlansModal
+  );
+
+  elements.closePlansButton.addEventListener(
+    "click",
+    closePlansModal
+  );
+
+  elements.individualPlanButton.addEventListener(
+    "click",
+    () => {
+      setPlanAudience("individual");
+    }
+  );
+
+  elements.familyPlanButton.addEventListener(
+    "click",
+    () => {
+      setPlanAudience("family");
+    }
+  );
+
+  elements.monthlyBillingButton.addEventListener(
+    "click",
+    () => {
+      setBillingPeriod("monthly");
+    }
+  );
+
+  elements.yearlyBillingButton.addEventListener(
+    "click",
+    () => {
+      setBillingPeriod("yearly");
+    }
+  );
+
+  elements.previewPlusButton.addEventListener(
+    "click",
+    () => {
+      previewPlan("Plus");
+    }
+  );
+
+  elements.previewProButton.addEventListener(
+    "click",
+    () => {
+      previewPlan("Pro");
+    }
+  );
+
+  elements.previewGiftButton.addEventListener(
+    "click",
+    () => {
+      openPreview(
+        "Collo Gifts",
+        "Collo Plus and Collo Pro will be giftable for selected durations. Gift memberships will not renew automatically.",
+        "G"
+      );
+    }
+  );
+
+  elements.closePreviewButton.addEventListener(
+    "click",
+    closePreview
+  );
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 780) {
+      closeNavigation();
+    }
+  });
 }
 
 async function initialize() {
@@ -2496,8 +2300,7 @@ async function initialize() {
     const {
       data: { session },
       error
-    } =
-      await supabaseClient.auth.getSession();
+    } = await supabaseClient.auth.getSession();
 
     if (error) {
       throw error;
